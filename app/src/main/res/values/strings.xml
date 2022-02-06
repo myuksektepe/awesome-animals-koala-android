@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">Koala | Muhteşem Hayvanlar</string>
+
+    <string name="lipsum" translatable="false">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec quis maximus eros. Praesent finibus vel nisl volutpat interdum. Maecenas dapibus molestie consequat. Vivamus scelerisque metus ac dolor ullamcorper, in blandit tellus ullamcorper. Quisque varius lacus a mauris ullamcorper tristique. Aliquam nec odio pellentesque, pulvinar purus porttitor, congue eros. Suspendisse potenti. Nullam nec nulla et est aliquet viverra et non nisl. Etiam viverra consectetur mauris in viverra.</string>
+    <string name="warning">Uyarı</string>
+    <string name="error">Hata</string>
+    <string name="ok">Tamam</string>
+    <string name="yes">Evet</string>
+    <string name="no">Hayır</string>
+    <string name="cancel">İptal</string>
+    <string name="start">Başla</string>
+    <string name="pause">Durdur</string>
+    <string name="contiune">Devam Et</string>
+    <string name="perfect">Mükemmel!</string>
+    <string name="well_done">Tebrikler!</string>
+    <string name="completed">Tamamlandı</string>
+    <string name="try_again">Tekrar Dene</string>
+    <string name="loading">Yükleniyor…</string>
+    <string name="quick_search">Hızlı arama…</string>
+</resources>
