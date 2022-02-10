@@ -2,7 +2,10 @@ package awesome.animals.koala.prensentation.view.activity
 
 import android.os.Bundle
 import android.util.Log
+import android.view.RoundedCorner
+import android.view.View
 import androidx.activity.viewModels
+import androidx.appcompat.widget.AppCompatImageView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
 import androidx.viewpager2.widget.ViewPager2
@@ -12,7 +15,6 @@ import awesome.animals.koala.prensentation.adapter.ViewPagerAdapter
 import awesome.animals.koala.prensentation.base.BaseActivity
 import awesome.animals.koala.prensentation.view.fragment.PageFragment
 import awesome.animals.koala.prensentation.viewmodel.MainActivityViewModel
-import awesome.animals.koala.util.Animations.DepthPageTransformer
 import awesome.animals.koala.util.TAG
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -51,7 +53,10 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
         binding.viewPager.run {
             currentItem = 1
             adapter = pageAdapter
-            setPageTransformer(DepthPageTransformer())
+            //setPageTransformer(DepthPageTransformer())
+            setPageTransformer { page, position ->
+                setParallaxTransformation(page, position)
+            }
             registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
                 override fun onPageSelected(position: Int) {
                     super.onPageSelected(position)
@@ -72,5 +77,22 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
             cancelable = false
         )
          */
+    }
+
+    private fun setParallaxTransformation(page: View, position: Float) {
+        page.apply {
+            val parallaxView = this.findViewById<AppCompatImageView>(R.id.imgBackground)
+            when {
+                position < -1 -> // [-Infinity,-1)
+                    // This page is way off-screen to the left.
+                    alpha = 1f
+                position <= 1 -> { // [-1,1]
+                    parallaxView.translationX = -position * (width / 2) //Half the normal speed
+                }
+                else -> // (1,+Infinity]
+                    // This page is way off-screen to the right.
+                    alpha = 1f
+            }
+        }
     }
 }

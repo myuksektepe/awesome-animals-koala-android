@@ -1,30 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:animateLayoutChanges="true">
 
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:gravity="center"
         tools:context=".prensentation.view.fragment.PageFragment">
 
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/imgBackground"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-
-        <LinearLayout
-            android:id="@+id/lnrTexts"
-            android:visibility="gone"
+        <androidx.cardview.widget.CardView
+            android:id="@+id/crdPager"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom|end"
-            android:layout_margin="32dp"
-            android:background="@drawable/custom_dialog_background"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:padding="16dp">
+            android:layout_gravity="bottom|center"
+            app:cardCornerRadius="32dp"
+            app:cardElevation="16dp"
+            app:cardUseCompatPadding="true"
+            app:contentPadding="16dp">
 
             <TextView
                 android:id="@+id/txtPageTitle"
@@ -32,6 +26,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
                 android:text="@string/hello_blank_fragment"
+                android:textAlignment="center"
                 android:textSize="27sp"
                 android:visibility="gone" />
 
@@ -39,10 +34,16 @@
                 android:id="@+id/txtPageMessage"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/hello_blank_fragment" />
-        </LinearLayout>
+                android:letterSpacing=".1"
+                android:text="@string/hello_blank_fragment"
+                android:textAlignment="center"
+                android:textSize="23sp" />
 
+        </androidx.cardview.widget.CardView>
 
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/imgBackground"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
     </FrameLayout>
-
 </layout>

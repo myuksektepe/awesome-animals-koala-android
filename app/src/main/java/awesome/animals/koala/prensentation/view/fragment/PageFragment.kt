@@ -48,17 +48,21 @@ class PageFragment : BaseFragment<PageFragmentViewModel, FragmentPageBinding>() 
         }
     }
 
-    override fun onResume() {
-        super.onResume()
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         binding.txtPageTitle.text = title
         binding.txtPageMessage.text = message
 
         val anim_slide_in_down = AnimationUtils.loadAnimation(requireContext(), R.anim.slide_in_down)
-        binding.lnrTexts.run {
+        binding.crdPager.run {
             visibility = View.VISIBLE
             startAnimation(anim_slide_in_down)
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
 
     }
 
