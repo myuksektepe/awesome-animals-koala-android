@@ -2,7 +2,10 @@ package awesome.animals.koala.prensentation.view.activity
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
+import android.os.StrictMode
+import android.os.StrictMode.ThreadPolicy
 import android.util.Log
 import android.view.View
 import androidx.activity.viewModels
@@ -21,6 +24,9 @@ import awesome.animals.koala.prensentation.base.BaseActivity
 import awesome.animals.koala.prensentation.view.fragment.PageFragment
 import awesome.animals.koala.prensentation.viewmodel.MainActivityViewModel
 import awesome.animals.koala.util.TAG
+import awesome.animals.koala.util.ViewExtensions.animBounce
+import awesome.animals.koala.util.ViewExtensions.animFadeIn
+import awesome.animals.koala.util.ViewExtensions.animFadeOut
 import awesome.animals.koala.util.getJsonDataFromAsset
 import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
@@ -30,22 +36,43 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
 import java.io.File
 
+
 @AndroidEntryPoint
 class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() {
     override val layoutRes: Int = R.layout.activity_main
     override val viewModel: MainActivityViewModel by viewModels()
     override var viewLifeCycleOwner: LifecycleOwner = this
     private val context: Context = this@MainActivity
-    override fun obverseViewModel() {
-    }
-
     private var job: Job? = null
+    private var downloadJob: Job? = null
     private val client = HttpClient(CIO)
     private val url = "https://api.rit.im/obi-dahi/awesome-animals/koala/package.zip"
     private var file: File? = null
 
+    override fun obverseViewModel() {
+        networkConnection.observe(viewLifeCycleOwner) {
+            Log.i(TAG, "Network Connection: $it")
+
+            when (it) {
+                false -> {
+                    client.cancel()
+                    downloadJob?.cancel()
+                    noNetworkConnection()
+                }
+                true -> {
+                    hideDialog()
+                    downloadWithFlow()
+                    downloadJob?.start()
+                }
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val policy = ThreadPolicy.Builder().permitAll().build()
+        StrictMode.setThreadPolicy(policy)
 
         file = File("${getDir("packages", Context.MODE_PRIVATE)}/koala.zip")
 
@@ -89,18 +116,8 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
             }
 
         }
+        job!!.cancel()
 
-        /*
-        this.showCustomDialog(
-            title = "Selam",
-            message = "Koalaları Tanımaya Hazır Mısın?",
-            positiveButtonText = "Evet",
-            negativeButtonText = "Belki Sonra",
-            positiveButtonCallback = { null },
-            negativeButtonCallback = {},
-            cancelable = false
-        )
-         */
     }
 
     private fun setParallaxTransformation(page: View, position: Float) {
@@ -122,24 +139,109 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
 
     @SuppressLint("SetTextI18n")
     private fun downloadWithFlow() {
-        CoroutineScope(Dispatchers.IO).launch {
-            client.downloadFile(file!!, url).collect {
-                withContext(Dispatchers.Main) {
-                    binding.frmLoading.visibility = View.VISIBLE
-                    when (it) {
-                        is DownloadStatus.Success -> {
-                            binding.txtProgress.text = "İndirme Başarılı: ${it}"
-                        }
-                        is DownloadStatus.Error -> {
-                            binding.txtProgress.text = it.message
-                        }
-                        is DownloadStatus.Progress -> {
-                            binding.txtProgress.text = "${it.progress}%"
-                            binding.progress.progress = it.progress
+        downloadJob?.cancel()
+        downloadJob = CoroutineScope(Dispatchers.IO).launch {
+            if (isNetworkAvailable()) {
+                client.downloadFile(file!!, url).collect {
+                    withContext(Dispatchers.Main) {
+                        binding.frmLoading.visibility = View.VISIBLE
+                        when (it) {
+                            is DownloadStatus.Success -> {
+                                binding.txtProgress.text = "İndirme Başarılı: ${it}"
+                            }
+                            is DownloadStatus.Error -> {
+                                binding.txtProgress.text = it.message
+                            }
+                            is DownloadStatus.Progress -> {
+                                binding.txtProgress.text = "${it.progress}%"
+                                binding.progress.progress = it.progress
+                            }
                         }
                     }
                 }
+            } else {
+                noNetworkConnection()
+                downloadJob?.cancel()
             }
         }
+        Log.i(TAG, "downloadJob: $downloadJob")
+    }
+
+    private fun noNetworkConnection() {
+        showDialog(
+            title = "İnternet Bağlantı Hatası",
+            message = "İnternet bağlantısı olmadığı için şu anda işleme devam edilemiyor. Yeniden denemek ister misiniz?",
+            positiveButtonText = "Evet",
+            negativeButtonText = "Ayarlara Git",
+            positiveButtonCallback = {
+                hideDialog()
+                downloadWithFlow()
+            },
+            negativeButtonCallback = { openWifiSettings() },
+        )
+    }
+
+    private fun showDialog(
+        title: String,
+        message: String,
+        positiveButtonText: String?,
+        negativeButtonText: String?,
+        positiveButtonCallback: () -> (Unit)?,
+        negativeButtonCallback: () -> (Unit)?,
+    ) {
+        lifecycleScope.launch(Dispatchers.Main) {
+            binding.dialogTitle.text = title
+            binding.dialogMessage.text = message
+
+            if (!positiveButtonText.isNullOrBlank()) {
+                binding.dialogPositiveButton.visibility = View.VISIBLE
+                binding.dialogPositiveButton.text = positiveButtonText
+            } else {
+                binding.dialogPositiveButton.visibility = View.GONE
+            }
+
+            if (!negativeButtonText.isNullOrBlank()) {
+                binding.dialogNegativeButton.visibility = View.VISIBLE
+                binding.dialogNegativeButton.text = negativeButtonText
+            } else {
+                binding.dialogNegativeButton.visibility = View.GONE
+            }
+
+            binding.dialogPositiveButton.setOnClickListener {
+                positiveButtonCallback() ?: run {
+                    binding.frmDialog.startAnimation(this@MainActivity.animFadeOut())
+                    binding.frmDialog.visibility = View.GONE
+                }
+            }
+
+            binding.dialogNegativeButton.setOnClickListener {
+                negativeButtonCallback() ?: run {
+                    binding.frmDialog.startAnimation(this@MainActivity.animFadeOut())
+                    binding.frmDialog.visibility = View.GONE
+                }
+            }
+
+            binding.frmDialog.visibility = View.VISIBLE
+            binding.frmDialog.startAnimation(this@MainActivity.animFadeIn())
+            binding.lnrDialog.startAnimation(this@MainActivity.animBounce())
+        }
+    }
+
+    private fun hideDialog() {
+        if (binding.frmDialog.isShown) {
+            binding.frmDialog.startAnimation(this.animFadeOut())
+            binding.frmDialog.visibility = View.GONE
+
+            binding.dialogTitle.text = ""
+            binding.dialogMessage.text = ""
+            binding.dialogPositiveButton.text = ""
+            binding.dialogNegativeButton.text = ""
+        }
+    }
+
+    private fun openWifiSettings() {
+        val intent = Intent(Intent.ACTION_MAIN)
+        intent.setClassName("com.android.settings", "com.android.settings.wifi.WifiSettings")
+        startActivity(intent)
     }
 }

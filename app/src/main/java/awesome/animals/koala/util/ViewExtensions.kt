@@ -16,6 +16,7 @@ object ViewExtensions {
     fun Context.animSlideInLeft() = AnimationUtils.loadAnimation(this, R.anim.slide_right_to_left)
     fun Context.animFadeOut() = AnimationUtils.loadAnimation(this, R.anim.fade_out)
     fun Context.animFadeIn() = AnimationUtils.loadAnimation(this, R.anim.fade_in)
+    fun Context.animBounce() = AnimationUtils.loadAnimation(this, R.anim.bounce)
 
     fun Activity.showCustomDialog(
         title: String,
