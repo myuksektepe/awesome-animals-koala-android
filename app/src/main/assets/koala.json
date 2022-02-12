@@ -3,8 +3,9 @@
     {
       "title": "Page 1",
       "message": "Avustralya'ya özgü otobur ve ağaçta yaşayan bir keseli memeli hayvan türüdür.",
-      "video": "https://vod-progressive.akamaized.net/exp=1644688306~acl=%2Fvimeo-prod-skyfire-std-us%2F01%2F2199%2F19%2F485996873%2F2176892487.mp4~hmac=6191337e95a1e59a06783b9d4d41105194869eeee8065f21b1c9f5ec8050a47d/vimeo-prod-skyfire-std-us/01/2199/19/485996873/2176892487.mp4?filename=pexels-valeriia-miller-6040389.mp4",
-      "video_cover": "https://images.pexels.com/videos/6040389/pexels-photo-6040389.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500",
+      "video": "video_page_1.mp4",
+      "video_cover": "cover_page_1.jpeg",
+      "voice": "voice_page_1.mp3",
       "is_active": 1
     },
     {
@@ -16,7 +17,7 @@
     },
     {
       "title": "Page 3",
-      "message": "Hello!",
+      "message": "Kürkü, gümüşi gri ile çikolata rengi arasındaki renklerdedir.",
       "video": "https://vod-progressive.akamaized.net/exp=1644688044~acl=%2Fvimeo-prod-skyfire-std-us%2F01%2F2199%2F19%2F485995930%2F2176888682.mp4~hmac=7e9705dd5299e6ea753478452acef0479d526b62db233c0c9a1d7f881edb34bf/vimeo-prod-skyfire-std-us/01/2199/19/485995930/2176888682.mp4?filename=pexels-valeriia-miller-6040370.mp4",
       "video_cover": "https://images.pexels.com/videos/6040370/pexels-photo-6040370.jpeg",
       "is_active": 1
