@@ -74,22 +74,25 @@ dependencies {
     implementation "androidx.hilt:hilt-lifecycle-viewmodel:$hilt_lifecycle_version"
     kapt "androidx.hilt:hilt-compiler:$hilt_lifecycle_version"
 
-    def retrofit_version = "2.9.0"
-    implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
-    implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
-
     def logging_interceptor_version = "4.9.0"
     implementation "com.squareup.okhttp3:logging-interceptor:$logging_interceptor_version"
 
     def co_adapter_version = "0.9.2"
     implementation "com.jakewharton.retrofit:retrofit2-kotlin-coroutines-adapter:$co_adapter_version"
 
+    def rxbinding_version = "0.4.0"
+    implementation "com.jakewharton.rxbinding:rxbinding:$rxbinding_version"
+
+    def retrofit_version = "2.9.0"
+    implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
+    implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
+    
+    def gson_version = "2.9.0"
+    implementation "com.google.code.gson:gson:$gson_version"
+
     def glide_version = "4.12.0"
     implementation "com.github.bumptech.glide:glide:$glide_version"
     kapt "com.github.bumptech.glide:compiler:$glide_version"
-
-    def rxbinding_version = "0.4.0"
-    implementation "com.jakewharton.rxbinding:rxbinding:$rxbinding_version"
 
     // Local Unit Test
     implementation 'androidx.test.ext:junit-ktx:1.1.3'

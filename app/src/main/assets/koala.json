@@ -1,0 +1,25 @@
+{
+  "pages": [
+    {
+      "title": "Page 1",
+      "message": "Avustralya'ya özgü otobur ve ağaçta yaşayan bir keseli memeli hayvan türüdür.",
+      "video": "https://vod-progressive.akamaized.net/exp=1644688306~acl=%2Fvimeo-prod-skyfire-std-us%2F01%2F2199%2F19%2F485996873%2F2176892487.mp4~hmac=6191337e95a1e59a06783b9d4d41105194869eeee8065f21b1c9f5ec8050a47d/vimeo-prod-skyfire-std-us/01/2199/19/485996873/2176892487.mp4?filename=pexels-valeriia-miller-6040389.mp4",
+      "video_cover": "https://images.pexels.com/videos/6040389/pexels-photo-6040389.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500",
+      "is_active": 1
+    },
+    {
+      "title": "Page 2",
+      "message": "Vücut uzunlukları 60 ila 85 cm, ağırlıkları ise 4 ila 15 kg arasında değişiklik gösterir.",
+      "video": "https://vod-progressive.akamaized.net/exp=1644677658~acl=%2Fvimeo-prod-skyfire-std-us%2F01%2F3284%2F19%2F491424599%2F2208421692.mp4~hmac=7591a65de6ae9e4f1119ca2e7c9e4163dd9adb48a26474a1ffe40d1cdbe18338/vimeo-prod-skyfire-std-us/01/3284/19/491424599/2208421692.mp4",
+      "video_cover": "https://i.vimeocdn.com/video/1016361069-6a07cfee81667329cb0f474f5d054727cfc5f058876919db305ab8fd15ec3e36-d?mw=1000&mh=563&q=70",
+      "is_active": 1
+    },
+    {
+      "title": "Page 3",
+      "message": "Hello!",
+      "video": "https://vod-progressive.akamaized.net/exp=1644688044~acl=%2Fvimeo-prod-skyfire-std-us%2F01%2F2199%2F19%2F485995930%2F2176888682.mp4~hmac=7e9705dd5299e6ea753478452acef0479d526b62db233c0c9a1d7f881edb34bf/vimeo-prod-skyfire-std-us/01/2199/19/485995930/2176888682.mp4?filename=pexels-valeriia-miller-6040370.mp4",
+      "video_cover": "https://images.pexels.com/videos/6040370/pexels-photo-6040370.jpeg",
+      "is_active": 1
+    }
+  ]
+}

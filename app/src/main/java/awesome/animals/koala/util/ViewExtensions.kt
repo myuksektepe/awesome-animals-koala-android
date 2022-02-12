@@ -5,11 +5,17 @@ import android.app.Dialog
 import android.content.Context
 import android.view.View
 import android.view.Window
+import android.view.animation.AnimationUtils
 import android.widget.Button
 import android.widget.TextView
 import awesome.animals.koala.R
 
 object ViewExtensions {
+
+    fun Context.animSlideInDown() = AnimationUtils.loadAnimation(this, R.anim.slide_in_down)
+    fun Context.animSlideInLeft() = AnimationUtils.loadAnimation(this, R.anim.slide_right_to_left)
+    fun Context.animFadeOut() = AnimationUtils.loadAnimation(this, R.anim.fade_out)
+    fun Context.animFadeIn() = AnimationUtils.loadAnimation(this, R.anim.fade_in)
 
     fun Activity.showCustomDialog(
         title: String,
