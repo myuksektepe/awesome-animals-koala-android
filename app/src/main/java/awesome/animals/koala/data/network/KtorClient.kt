@@ -1,8 +1,6 @@
 package awesome.animals.koala.data.network
 
-import android.util.Log
 import awesome.animals.koala.domain.model.DownloadStatus
-import awesome.animals.koala.util.TAG
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
@@ -11,8 +9,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import java.io.File
 import kotlin.math.roundToInt
-
-//val client = HttpClient(CIO)
 
 suspend fun HttpClient.downloadFile(file: File, url: String): Flow<DownloadStatus> {
     return flow {
@@ -26,7 +22,6 @@ suspend fun HttpClient.downloadFile(file: File, url: String): Flow<DownloadStatu
             val currentRead = response.content.readAvailable(byteArray, offset, byteArray.size)
             offset += currentRead
             val progress = (offset * 100f / byteArray.size).roundToInt()
-            Log.i(TAG, "progress: $progress")
             emit(DownloadStatus.Progress(progress))
         } while (currentRead > 0)
         response.close()

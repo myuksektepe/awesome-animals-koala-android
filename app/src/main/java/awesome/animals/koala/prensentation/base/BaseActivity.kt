@@ -9,6 +9,7 @@ import android.net.ConnectivityManager
 import android.net.Network
 import android.os.Build
 import android.os.Bundle
+import android.os.StrictMode
 import android.view.View
 import android.view.Window
 import android.view.WindowManager
@@ -48,6 +49,8 @@ abstract class BaseActivity<T : BaseViewModel, B : ViewDataBinding> : AppCompatA
         _binding = DataBindingUtil.inflate(layoutInflater, layoutRes, null, false)
         setContentView(_binding!!.root)
 
+        val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
+        StrictMode.setThreadPolicy(policy)
 
         val connectivityManager = this.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {

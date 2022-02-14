@@ -87,9 +87,10 @@ dependencies {
     implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
     implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
 
-    def ktor_version = "1.2.2"
+    def ktor_version = "1.2.5"
     implementation "io.ktor:ktor-client-core:$ktor_version"
     implementation "io.ktor:ktor-client-cio:$ktor_version"
+    implementation "io.ktor:ktor-client-android:$ktor_version"
 
 
     def gson_version = "2.9.0"

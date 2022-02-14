@@ -4,8 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.os.StrictMode
-import android.os.StrictMode.ThreadPolicy
 import android.util.Log
 import android.view.View
 import androidx.activity.viewModels
@@ -42,12 +40,14 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
     override val layoutRes: Int = R.layout.activity_main
     override val viewModel: MainActivityViewModel by viewModels()
     override var viewLifeCycleOwner: LifecycleOwner = this
+
     private val context: Context = this@MainActivity
     private var job: Job? = null
     private var downloadJob: Job? = null
     private val client = HttpClient(CIO)
     private val url = "https://api.rit.im/obi-dahi/awesome-animals/koala/package.zip"
-    private var file: File? = null
+    private var is_downloadable = false
+    private lateinit var file: File
 
     override fun obverseViewModel() {
         networkConnection.observe(viewLifeCycleOwner) {
@@ -55,14 +55,17 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
 
             when (it) {
                 false -> {
-                    client.cancel()
+                    //client.close()
+                    //client.cancel()
                     downloadJob?.cancel()
                     noNetworkConnection()
                 }
                 true -> {
-                    hideDialog()
-                    downloadWithFlow()
-                    downloadJob?.start()
+                    if (is_downloadable) {
+                        hideDialog()
+                        downloadWithFlow()
+                        //downloadJob?.start()
+                    }
                 }
             }
         }
@@ -71,52 +74,58 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val policy = ThreadPolicy.Builder().permitAll().build()
-        StrictMode.setThreadPolicy(policy)
+        lifecycleScope.launch(Dispatchers.IO) {
+            //file = File("${getDir("packages", Context.MODE_PRIVATE)}/koala.zip")
+            file = File("${getDir("packages", Context.MODE_APPEND)}/koala.zip")
 
-        file = File("${getDir("packages", Context.MODE_PRIVATE)}/koala.zip")
-
-        downloadWithFlow()
-
-        job = lifecycleScope.launchWhenCreated {
-
-            val fragmentList = mutableListOf<Fragment>()
-            val json = getJsonDataFromAsset(context, "koala.json")
-            val gson = Gson().fromJson(json, PagesModel::class.java)
-
-            for (page in gson.pages) {
-                Log.i(TAG, "Page: $page")
-                val pageModel = PageModel(
-                    title = page.title,
-                    message = page.message,
-                    video = page.video,
-                    video_cover = page.video_cover
-                )
-                fragmentList.add(PageFragment.newInstance(pageModel))
+            if (file.exists()) {
+                Log.i(TAG, "Dosya zaten mevcut! ${file.absolutePath}")
+                is_downloadable = false
+            } else {
+                //downloadWithFlow()
+                is_downloadable = true
             }
 
-            val pageAdapter = ViewPagerAdapter(this@MainActivity, fragmentList)
+            job = lifecycleScope.launchWhenCreated {
 
-            binding.viewPager.run {
-                currentItem = 1
-                adapter = pageAdapter
-                //setPageTransformer(DepthPageTransformer())
-                setPageTransformer { page, position ->
-                    setParallaxTransformation(page, position)
+                val fragmentList = mutableListOf<Fragment>()
+                val json = getJsonDataFromAsset(context, "koala.json")
+                val gson = Gson().fromJson(json, PagesModel::class.java)
+
+                for (page in gson.pages) {
+                    Log.i(TAG, "Page: $page")
+                    val pageModel = PageModel(
+                        title = page.title,
+                        message = page.message,
+                        video = page.video,
+                        video_cover = page.video_cover
+                    )
+                    fragmentList.add(PageFragment.newInstance(pageModel))
                 }
-                /*
-                registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-                    override fun onPageSelected(position: Int) {
-                        super.onPageSelected(position)
-                        Log.i(TAG, "Pager Position: $position")
-                        //when (position) { }
-                    }
-                })
-                 */
-            }
 
+                val pageAdapter = ViewPagerAdapter(this@MainActivity, fragmentList)
+
+                binding.viewPager.run {
+                    currentItem = 1
+                    adapter = pageAdapter
+                    //setPageTransformer(DepthPageTransformer())
+                    setPageTransformer { page, position ->
+                        setParallaxTransformation(page, position)
+                    }
+                    /*
+                    registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+                        override fun onPageSelected(position: Int) {
+                            super.onPageSelected(position)
+                            Log.i(TAG, "Pager Position: $position")
+                            //when (position) { }
+                        }
+                    })
+                     */
+                }
+
+            }
+            job!!.cancel()
         }
-        job!!.cancel()
 
     }
 
@@ -139,32 +148,39 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
 
     @SuppressLint("SetTextI18n")
     private fun downloadWithFlow() {
-        downloadJob?.cancel()
-        downloadJob = CoroutineScope(Dispatchers.IO).launch {
-            if (isNetworkAvailable()) {
-                client.downloadFile(file!!, url).collect {
-                    withContext(Dispatchers.Main) {
-                        binding.frmLoading.visibility = View.VISIBLE
-                        when (it) {
-                            is DownloadStatus.Success -> {
-                                binding.txtProgress.text = "İndirme Başarılı: ${it}"
-                            }
-                            is DownloadStatus.Error -> {
-                                binding.txtProgress.text = it.message
-                            }
-                            is DownloadStatus.Progress -> {
-                                binding.txtProgress.text = "${it.progress}%"
-                                binding.progress.progress = it.progress
+        if (isNetworkAvailable()) {
+            try {
+                downloadJob?.cancel()
+                downloadJob = CoroutineScope(Dispatchers.IO).launch {
+                    Log.i(TAG, "Dosya indiriliyor...")
+
+                    client.downloadFile(file, url).collect {
+                        withContext(Dispatchers.Main) {
+                            binding.frmDownloading.visibility = View.VISIBLE
+                            when (it) {
+                                is DownloadStatus.Success -> {
+                                    binding.txtProgress.text = "İndirme Başarılı: ${it}"
+                                }
+                                is DownloadStatus.Error -> {
+                                    binding.txtProgress.text = it.message
+                                }
+                                is DownloadStatus.Progress -> {
+                                    binding.txtProgress.text = "${it.progress}%"
+                                    binding.progress.progress = it.progress
+                                    Log.i(TAG, "Progress: ${it.progress}")
+                                }
                             }
                         }
                     }
+
                 }
-            } else {
-                noNetworkConnection()
-                downloadJob?.cancel()
+                Log.i(TAG, "downloadJob: ${downloadJob}")
+            } catch (e: Exception) {
+                Log.e(TAG, "downloadWithFlow: ${e.message}")
             }
+        } else {
+            noNetworkConnection()
         }
-        Log.i(TAG, "downloadJob: $downloadJob")
     }
 
     private fun noNetworkConnection() {
@@ -228,14 +244,16 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
     }
 
     private fun hideDialog() {
-        if (binding.frmDialog.isShown) {
-            binding.frmDialog.startAnimation(this.animFadeOut())
-            binding.frmDialog.visibility = View.GONE
+        lifecycleScope.launch(Dispatchers.Main) {
+            if (binding.frmDialog.isShown) {
+                binding.frmDialog.startAnimation(context.animFadeOut())
+                binding.frmDialog.visibility = View.GONE
 
-            binding.dialogTitle.text = ""
-            binding.dialogMessage.text = ""
-            binding.dialogPositiveButton.text = ""
-            binding.dialogNegativeButton.text = ""
+                binding.dialogTitle.text = ""
+                binding.dialogMessage.text = ""
+                binding.dialogPositiveButton.text = ""
+                binding.dialogNegativeButton.text = ""
+            }
         }
     }
 
@@ -243,5 +261,16 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
         val intent = Intent(Intent.ACTION_MAIN)
         intent.setClassName("com.android.settings", "com.android.settings.wifi.WifiSettings")
         startActivity(intent)
+    }
+
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        if (hasFocus) {
+            downloadJob?.let {
+                if (it.isActive) {
+                    hideDialog()
+                }
+            }
+        }
     }
 }
