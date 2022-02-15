@@ -1,15 +1,15 @@
 package awesome.animals.koala.data.network
 
-import awesome.animals.koala.domain.model.DownloadStatus
+import android.util.Log
+import awesome.animals.koala.util.TAG
 import io.ktor.client.*
-import io.ktor.client.call.*
-import io.ktor.client.request.*
-import io.ktor.http.*
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
-import java.io.File
-import kotlin.math.roundToInt
+import io.ktor.client.engine.cio.*
+import io.ktor.client.features.*
+import io.ktor.client.features.json.*
+import io.ktor.client.features.json.serializer.*
+import io.ktor.client.features.logging.*
 
+/*
 suspend fun HttpClient.downloadFile(file: File, url: String): Flow<DownloadStatus> {
     return flow {
         val response = call {
@@ -30,6 +30,36 @@ suspend fun HttpClient.downloadFile(file: File, url: String): Flow<DownloadStatu
             emit(DownloadStatus.Success)
         } else {
             emit(DownloadStatus.Error("File not downloaded"))
+        }
+    }
+}
+ */
+
+object KtorClient {
+    private val json = kotlinx.serialization.json.Json {
+        encodeDefaults = true
+        ignoreUnknownKeys = true
+    }
+
+    val httpClient = HttpClient(CIO) {
+
+        install(JsonFeature){
+            serializer = KotlinxSerializer(json)
+        }
+
+        install(Logging) {
+            level = LogLevel.ALL
+            logger = object : Logger {
+                override fun log(message: String) {
+                    Log.i(TAG, "Ktor Log: $message")
+                }
+            }
+        }
+
+        install(HttpTimeout) {
+            socketTimeoutMillis = 30_000
+            connectTimeoutMillis = 30_000
+            requestTimeoutMillis = 30_000
         }
     }
 }

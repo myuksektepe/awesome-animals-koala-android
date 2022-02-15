@@ -15,5 +15,6 @@
     <string name="completed">Completed</string>
     <string name="try_again">Try Again</string>
     <string name="loading">Loading…</string>
+    <string name="downloading">Downloading…</string>
     <string name="quick_search">Quick Search…</string>
 </resources>

@@ -1,4 +1,4 @@
-package awesome.animals.koala.util.Animations
+package awesome.animals.koala.util.animations
 
 import android.view.View
 import androidx.annotation.RequiresApi

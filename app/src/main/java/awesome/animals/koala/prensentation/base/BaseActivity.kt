@@ -19,7 +19,9 @@ import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import awesome.animals.koala.R
-
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 abstract class BaseActivity<T : BaseViewModel, B : ViewDataBinding> : AppCompatActivity() {
 
@@ -91,10 +93,10 @@ abstract class BaseActivity<T : BaseViewModel, B : ViewDataBinding> : AppCompatA
     fun hideLoading1() = loadingAlertDialog.hide()
 
 
-    fun isNetworkAvailable(): Boolean {
+    suspend fun isNetworkAvailable(): Boolean = withContext(Dispatchers.IO) {
         val connectivityManager = getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
         val activeNetworkInfo = connectivityManager.activeNetworkInfo
-        return activeNetworkInfo != null && activeNetworkInfo.isConnected
+        activeNetworkInfo != null && activeNetworkInfo.isConnected
     }
 
     @SuppressLint("NewApi")

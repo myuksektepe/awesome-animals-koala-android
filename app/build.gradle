@@ -57,7 +57,7 @@ dependencies {
     def androidx_fragment_ktx_version = "1.4.1"
     implementation "androidx.fragment:fragment-ktx:$androidx_fragment_ktx_version"
 
-    def lifecycle_version = "2.4.0"
+    def lifecycle_version = "2.4.1"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version"
@@ -87,10 +87,13 @@ dependencies {
     implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
     implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
 
-    def ktor_version = "1.2.5"
+    def ktor_version = "1.6.7"
     implementation "io.ktor:ktor-client-core:$ktor_version"
     implementation "io.ktor:ktor-client-cio:$ktor_version"
     implementation "io.ktor:ktor-client-android:$ktor_version"
+    implementation "io.ktor:ktor-client-json:$ktor_version"
+    implementation "io.ktor:ktor-client-logging-jvm:$ktor_version"
+    implementation "io.ktor:ktor-client-serialization-jvm:$ktor_version"
 
 
     def gson_version = "2.9.0"

@@ -16,6 +16,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
+
         <!-- Downloading -->
         <FrameLayout
             android:id="@+id/frmDownloading"
@@ -36,7 +37,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="16dp"
-                    android:text="@string/loading" />
+                    android:text="@string/downloading" />
 
                 <androidx.core.widget.ContentLoadingProgressBar
                     android:id="@+id/progress"
@@ -55,6 +56,33 @@
                     android:textSize="12sp" />
 
             </LinearLayout>
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/frmMain"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btnDownload"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="İndir" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btnStop"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Durdur" />
+            </LinearLayout>
+
         </FrameLayout>
 
         <!-- Dialog -->

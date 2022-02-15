@@ -16,7 +16,6 @@
     <string name="completed">Tamamlandı</string>
     <string name="try_again">Tekrar Dene</string>
     <string name="loading">Yükleniyor…</string>
+    <string name="downloading">İndiriliyor…</string>
     <string name="quick_search">Hızlı arama…</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
