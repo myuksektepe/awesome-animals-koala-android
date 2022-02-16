@@ -21,7 +21,6 @@ import awesome.animals.koala.util.ViewExtensions.animFadeOut
 import awesome.animals.koala.util.openWifiSettings
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.collect
 import java.io.File
 
 
@@ -34,6 +33,7 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
     private val context: Context = this@MainActivity
     private var job: Job? = null
     private var downloadJob: Job? = null
+    private var downloadJob2: CoroutineScope? = null
     private val url = "https://api.rit.im/obi-dahi/awesome-animals/koala/package.zip"
     private lateinit var file: File
 
@@ -43,8 +43,8 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
 
             when (it) {
                 false -> {
-                    downloadJob?.cancel()
-                    Log.i(TAG, "DownloadJob: $downloadJob")
+                    downloadJob2?.cancel()
+                    Log.i(TAG, "DownloadJob: $downloadJob2")
                     noNetworkConnection()
                 }
                 true -> {
@@ -52,6 +52,23 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
                     runBlocking {
                         //downloadWithFlow()
                     }
+                }
+            }
+        }
+
+
+        viewModel.downloadState.observe(viewLifeCycleOwner) {
+            when (it) {
+                is DownloadStatus.Success -> {
+                    binding.txtProgress.text = "İndirme Başarılı: ${it}"
+                }
+                is DownloadStatus.Error -> {
+                    binding.txtProgress.text = it.message
+                }
+                is DownloadStatus.Progress -> {
+                    binding.txtProgress.text = "${it.progress}%"
+                    binding.progress.progress = it.progress
+                    Log.i(TAG, "Progrees: ${it.progress}")
                 }
             }
         }
@@ -103,57 +120,40 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
 
 
         binding.btnStop.setOnClickListener {
-            downloadJob?.cancel()
-            Log.i(TAG, "DownloadJob: $downloadJob")
+            downloadJob2?.cancel()
+            Log.i(TAG, "DownloadJob: $downloadJob2")
         }
 
         binding.btnDownload.setOnClickListener {
-            lifecycleScope.launch {
+            if (checkFileExists()) {
                 downloadWithFlow()
             }
-            Log.i(TAG, "DownloadJob: $downloadJob")
+            //Log.i(TAG, "DownloadJob: $downloadJob")
         }
     }
 
-    private suspend fun checkFileExists(): Boolean = withContext(Dispatchers.IO) {
+    private fun checkFileExists(): Boolean {
         //file = File("${getDir("packages", Context.MODE_PRIVATE)}/koala.zip")
         file = File("${getDir("packages", Context.MODE_APPEND)}/koala.zip")
         if (file.exists()) {
             Log.i(TAG, "Dosya zaten mevcut! ${file.absolutePath}")
-            true
+            return true
         } else {
-            false
+            return true
         }
     }
 
     @SuppressLint("SetTextI18n")
-    private suspend fun downloadWithFlow() {
+    private fun downloadWithFlow() {
         if (isNetworkAvailable()) {
-            downloadJob?.cancel()
-            downloadJob = CoroutineScope(Dispatchers.IO).launch {
-                Log.i(TAG, "Dosya indiriliyor...")
-
-                Log.i(TAG, viewModel.murat)
-
-                /*
-                viewModel.downloadFile(file, url).collect {
-                    //withContext(Dispatchers.Main) {
-                        binding.frmDownloading.visibility = View.VISIBLE
-                        when (it) {
-                            is DownloadStatus.Success -> {
-                                binding.txtProgress.text = "İndirme Başarılı: ${it}"
-                            }
-                            is DownloadStatus.Error -> {
-                                binding.txtProgress.text = it.message
-                            }
-                            is DownloadStatus.Progress -> {
-                                binding.txtProgress.text = "${it.progress}%"
-                                binding.progress.progress = it.progress
-                            }
-                        }
-                    //}
+            downloadJob2?.cancel()
+            downloadJob2 = CoroutineScope(Dispatchers.Main)
+            downloadJob2?.launch {
+                binding.frmDownloading.visibility = View.VISIBLE
+                async {
+                    Log.i(TAG, "Dosya indiriliyor...")
+                    viewModel.downloadFile(file, url)
                 }
-                 */
             }
             Log.i(TAG, "downloadJob: ${downloadJob}")
         } else {

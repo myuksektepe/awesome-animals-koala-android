@@ -93,10 +93,10 @@ abstract class BaseActivity<T : BaseViewModel, B : ViewDataBinding> : AppCompatA
     fun hideLoading1() = loadingAlertDialog.hide()
 
 
-    suspend fun isNetworkAvailable(): Boolean = withContext(Dispatchers.IO) {
+    fun isNetworkAvailable(): Boolean {
         val connectivityManager = getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
         val activeNetworkInfo = connectivityManager.activeNetworkInfo
-        activeNetworkInfo != null && activeNetworkInfo.isConnected
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected
     }
 
     @SuppressLint("NewApi")

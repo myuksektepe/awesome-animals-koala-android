@@ -43,12 +43,12 @@ object KtorClient {
 
     val httpClient = HttpClient(CIO) {
 
-        install(JsonFeature){
+        install(JsonFeature) {
             serializer = KotlinxSerializer(json)
         }
 
         install(Logging) {
-            level = LogLevel.ALL
+            level = LogLevel.NONE
             logger = object : Logger {
                 override fun log(message: String) {
                     Log.i(TAG, "Ktor Log: $message")
