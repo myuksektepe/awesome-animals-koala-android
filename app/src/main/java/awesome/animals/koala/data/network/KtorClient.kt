@@ -3,6 +3,7 @@ package awesome.animals.koala.data.network
 import android.util.Log
 import awesome.animals.koala.util.TAG
 import io.ktor.client.*
+import io.ktor.client.engine.android.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.features.*
 import io.ktor.client.features.json.*
@@ -41,7 +42,7 @@ object KtorClient {
         ignoreUnknownKeys = true
     }
 
-    val httpClient = HttpClient(CIO) {
+    val httpClient = HttpClient(Android) {
 
         install(JsonFeature) {
             serializer = KotlinxSerializer(json)

@@ -21,6 +21,7 @@ import awesome.animals.koala.util.ViewExtensions.animFadeOut
 import awesome.animals.koala.util.openWifiSettings
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.collect
 import java.io.File
 
 
@@ -56,8 +57,23 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
             }
         }
 
-
         viewModel.downloadState.observe(viewLifeCycleOwner) {
+            when (it) {
+                is DownloadStatus.Success -> {
+                    binding.txtProgress.text = "İndirme Başarılı: ${it}"
+                }
+                is DownloadStatus.Error -> {
+                    binding.txtProgress.text = it.message
+                }
+                is DownloadStatus.Progress -> {
+                    binding.txtProgress.text = "${it.progress}%"
+                    binding.progress.progress = it.progress
+                    Log.i(TAG, "Progrees: ${it.progress}")
+                }
+            }
+        }
+
+        viewModel.countdown.observe(viewLifeCycleOwner) {
             when (it) {
                 is DownloadStatus.Success -> {
                     binding.txtProgress.text = "İndirme Başarılı: ${it}"
@@ -120,8 +136,8 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
 
 
         binding.btnStop.setOnClickListener {
-            downloadJob2?.cancel()
-            Log.i(TAG, "DownloadJob: $downloadJob2")
+            downloadJob?.cancel()
+            Log.i(TAG, "DownloadJob: $downloadJob")
         }
 
         binding.btnDownload.setOnClickListener {
@@ -146,19 +162,29 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
     @SuppressLint("SetTextI18n")
     private fun downloadWithFlow() {
         if (isNetworkAvailable()) {
-            downloadJob2?.cancel()
-            downloadJob2 = CoroutineScope(Dispatchers.Main)
-            downloadJob2?.launch {
+            downloadJob?.cancel()
+            downloadJob = CoroutineScope(Dispatchers.Main).launch {
                 binding.frmDownloading.visibility = View.VISIBLE
                 async {
                     Log.i(TAG, "Dosya indiriliyor...")
                     viewModel.downloadFile(file, url)
                 }
             }
-            Log.i(TAG, "downloadJob: ${downloadJob}")
+            Log.i(TAG, "downloadJob: $downloadJob")
         } else {
             noNetworkConnection()
         }
+    }
+
+    private fun countDownTest() {
+        downloadJob?.cancel()
+        downloadJob = lifecycleScope.launch(Dispatchers.Main) {
+            binding.frmDownloading.visibility = View.VISIBLE
+            viewModel.countdown().collect {
+                Log.i(TAG, "Count: $it")
+            }
+        }
+        Log.i(TAG, "downloadJob: $downloadJob")
     }
 
     private fun noNetworkConnection() {
