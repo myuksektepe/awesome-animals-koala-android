@@ -4,37 +4,10 @@ import android.util.Log
 import awesome.animals.koala.util.TAG
 import io.ktor.client.*
 import io.ktor.client.engine.android.*
-import io.ktor.client.engine.cio.*
 import io.ktor.client.features.*
 import io.ktor.client.features.json.*
 import io.ktor.client.features.json.serializer.*
 import io.ktor.client.features.logging.*
-
-/*
-suspend fun HttpClient.downloadFile(file: File, url: String): Flow<DownloadStatus> {
-    return flow {
-        val response = call {
-            url(url)
-            method = HttpMethod.Get
-        }.response
-        val byteArray = ByteArray(response.contentLength()!!.toInt())
-        var offset = 0
-        do {
-            val currentRead = response.content.readAvailable(byteArray, offset, byteArray.size)
-            offset += currentRead
-            val progress = (offset * 100f / byteArray.size).roundToInt()
-            emit(DownloadStatus.Progress(progress))
-        } while (currentRead > 0)
-        response.close()
-        if (response.status.isSuccess()) {
-            file.writeBytes(byteArray)
-            emit(DownloadStatus.Success)
-        } else {
-            emit(DownloadStatus.Error("File not downloaded"))
-        }
-    }
-}
- */
 
 object KtorClient {
     private val json = kotlinx.serialization.json.Json {

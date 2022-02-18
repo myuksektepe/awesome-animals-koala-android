@@ -5,7 +5,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath "com.android.tools.build:gradle:7.0.4"
+        classpath 'com.android.tools.build:gradle:7.1.1'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.6.10"
 
         def hilt_version = "2.38.1"
@@ -14,8 +14,8 @@ buildscript {
 }
 
 plugins {
-    id 'com.android.application' version '7.1.0' apply false
-    id 'com.android.library' version '7.1.0' apply false
+    id 'com.android.application' version '7.1.1' apply false
+    id 'com.android.library' version '7.1.1' apply false
     id 'org.jetbrains.kotlin.android' version '1.6.10' apply false
     //id 'dagger.hilt.android.plugin' version '2.38.1' apply false
 }

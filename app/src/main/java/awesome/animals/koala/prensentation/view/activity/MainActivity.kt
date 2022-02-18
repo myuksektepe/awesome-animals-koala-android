@@ -21,7 +21,6 @@ import awesome.animals.koala.util.ViewExtensions.animFadeOut
 import awesome.animals.koala.util.openWifiSettings
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.collect
 import java.io.File
 
 
@@ -44,14 +43,14 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
 
             when (it) {
                 false -> {
-                    downloadJob2?.cancel()
-                    Log.i(TAG, "DownloadJob: $downloadJob2")
+                    downloadJob?.cancel()
+                    Log.i(TAG, "DownloadJob: $downloadJob")
                     noNetworkConnection()
                 }
                 true -> {
                     hideDialog()
                     runBlocking {
-                        //downloadWithFlow()
+                        downloadWithFlow()
                     }
                 }
             }
@@ -68,23 +67,6 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
                 is DownloadStatus.Progress -> {
                     binding.txtProgress.text = "${it.progress}%"
                     binding.progress.progress = it.progress
-                    Log.i(TAG, "Progrees: ${it.progress}")
-                }
-            }
-        }
-
-        viewModel.countdown.observe(viewLifeCycleOwner) {
-            when (it) {
-                is DownloadStatus.Success -> {
-                    binding.txtProgress.text = "İndirme Başarılı: ${it}"
-                }
-                is DownloadStatus.Error -> {
-                    binding.txtProgress.text = it.message
-                }
-                is DownloadStatus.Progress -> {
-                    binding.txtProgress.text = "${it.progress}%"
-                    binding.progress.progress = it.progress
-                    Log.i(TAG, "Progrees: ${it.progress}")
                 }
             }
         }
@@ -134,6 +116,7 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
         job!!.cancel()
          */
 
+        file = File("${getDir("packages", Context.MODE_APPEND)}/koala.zip")
 
         binding.btnStop.setOnClickListener {
             downloadJob?.cancel()
@@ -144,13 +127,11 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
             if (checkFileExists()) {
                 downloadWithFlow()
             }
-            //Log.i(TAG, "DownloadJob: $downloadJob")
         }
     }
 
     private fun checkFileExists(): Boolean {
         //file = File("${getDir("packages", Context.MODE_PRIVATE)}/koala.zip")
-        file = File("${getDir("packages", Context.MODE_APPEND)}/koala.zip")
         if (file.exists()) {
             Log.i(TAG, "Dosya zaten mevcut! ${file.absolutePath}")
             return true
@@ -174,17 +155,6 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
         } else {
             noNetworkConnection()
         }
-    }
-
-    private fun countDownTest() {
-        downloadJob?.cancel()
-        downloadJob = lifecycleScope.launch(Dispatchers.Main) {
-            binding.frmDownloading.visibility = View.VISIBLE
-            viewModel.countdown().collect {
-                Log.i(TAG, "Count: $it")
-            }
-        }
-        Log.i(TAG, "downloadJob: $downloadJob")
     }
 
     private fun noNetworkConnection() {
