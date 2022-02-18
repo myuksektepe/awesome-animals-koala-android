@@ -33,7 +33,6 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
     private val context: Context = this@MainActivity
     private var job: Job? = null
     private var downloadJob: Job? = null
-    private var downloadJob2: CoroutineScope? = null
     private val url = "https://api.rit.im/obi-dahi/awesome-animals/koala/package.zip"
     private lateinit var file: File
 
@@ -146,10 +145,10 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
             downloadJob?.cancel()
             downloadJob = CoroutineScope(Dispatchers.Main).launch {
                 binding.frmDownloading.visibility = View.VISIBLE
-                async {
+                //async {
                     Log.i(TAG, "Dosya indiriliyor...")
                     viewModel.downloadFile(file, url)
-                }
+                //}
             }
             Log.i(TAG, "downloadJob: $downloadJob")
         } else {
