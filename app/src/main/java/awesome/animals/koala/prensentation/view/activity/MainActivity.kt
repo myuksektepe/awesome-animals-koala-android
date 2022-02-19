@@ -2,36 +2,29 @@ package awesome.animals.koala.prensentation.view.activity
 
 import android.Manifest
 import android.content.Context
-import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.Environment
-import android.provider.Settings
 import android.util.Log
 import android.view.View
-import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.cardview.widget.CardView
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import awesome.animals.koala.R
 import awesome.animals.koala.databinding.ActivityMainBinding
 import awesome.animals.koala.domain.model.DownloadStatus
+import awesome.animals.koala.domain.model.UnzipStatus
 import awesome.animals.koala.prensentation.base.BaseActivity
 import awesome.animals.koala.prensentation.viewmodel.MainActivityViewModel
 import awesome.animals.koala.util.TAG
-import awesome.animals.koala.util.UnzipUtils.unzip
 import awesome.animals.koala.util.ViewExtensions.animBounce
 import awesome.animals.koala.util.ViewExtensions.animFadeIn
 import awesome.animals.koala.util.ViewExtensions.animFadeOut
 import awesome.animals.koala.util.openWifiSettings
-import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -52,39 +45,64 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
     private val url = "https://api.rit.im/obi-dahi/awesome-animals/koala/package.zip"
     private lateinit var file: File
     private var downloadState: DownloadStatus? = null
+    private var tempUnit: () -> Unit? = { null }
 
     private var readPermissionGranted = false
     private var writePermissionGranted = false
     private lateinit var permissionsLauncher: ActivityResultLauncher<Array<String>>
 
-
     override fun obverseViewModel() {
+        // Network Status
         networkConnection.observe(viewLifeCycleOwner) {
-            Log.i(TAG, "Network Connection: $it")
-
+            Log.i(TAG, "Network ___ Connection: $it")
             when (it) {
                 false -> {
                     stopJob()
+                    noNetworkConnection()
                 }
                 true -> {
-                    runJob()
+                    if (downloadState == DownloadStatus.Started) {
+                        runJob()
+                    }
                 }
             }
         }
 
+        // Download Status
         viewModel.downloadState.observe(viewLifeCycleOwner) {
             when (it) {
                 is DownloadStatus.Success -> {
-                    binding.txtProgress.text = "İndirme Başarılı: ${it}"
+                    binding.txtDownloadState.text = getString(R.string.completed)
                     unzipFile()
                 }
                 is DownloadStatus.Error -> {
-                    binding.txtProgress.text = it.message
+                    binding.lnrDownloading.visibility = View.GONE
+                    binding.lnrDownloadThisBook.visibility = View.VISIBLE
+                    binding.txtDownloadState.text = getString(R.string.there_is_a_problem)
+                    binding.btnDownloadBook.text = getString(R.string.try_again)
                 }
                 is DownloadStatus.Progress -> {
                     binding.txtProgress.text = "${it.progress}%"
                     binding.progress.progress = it.progress
-                    Log.i(TAG, "Progress: ${it.progress} %")
+                }
+            }
+        }
+
+        // Unzip Status
+        viewModel.unzipState.observe(viewLifeCycleOwner) {
+            when (it) {
+                is UnzipStatus.Success -> {
+                    binding.txtDownloadState.text = getString(R.string.completed)
+                }
+                is UnzipStatus.Error -> {
+                    binding.lnrDownloading.visibility = View.GONE
+                    binding.lnrDownloadThisBook.visibility = View.VISIBLE
+                    binding.txtDownloadState.text = getString(R.string.there_is_a_problem)
+                    binding.btnDownloadBook.text = getString(R.string.try_again)
+                }
+                is UnzipStatus.Progress -> {
+                    binding.txtProgress.text = "${it.progress}%"
+                    binding.progress.progress = it.progress
                 }
             }
         }
@@ -134,18 +152,24 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
         job!!.cancel()
          */
 
+        file = File("${getDir("packages", Context.MODE_PRIVATE)}/koala.zip")
+        tempUnit = { runJob() }
 
         permissionRequest()
-        updateOrRequestPermissions()
+        //updateOrRequestPermissions()
 
-        file = File("${getDir("packages", Context.MODE_PRIVATE)}/koala.zip")
+        if (checkFileExists()) {
 
-        binding.btnStop.setOnClickListener {
-            stopJob()
+        } else {
+
         }
 
-        binding.btnDownload.setOnClickListener {
-            runJob()
+        binding.txtDownloadState.text = getString(R.string.download_this_book)
+        binding.lnrDownloadThisBook.visibility = View.VISIBLE
+        binding.btnDownloadBook.setOnClickListener {
+            downloadState = DownloadStatus.Started
+            updateOrRequestPermissions()
+            //runJob()
         }
 
     }
@@ -159,36 +183,22 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
                 noNetworkConnection()
             }
         } else {
-            unzipFile()
+            binding.txtDownloadState.text = getString(R.string.open_this_book)
+            binding.btnDownloadBook.setOnClickListener {
+                downloadState = DownloadStatus.Success
+                unzipFile()
+            }
         }
     }
 
     private fun stopJob() {
         downloadJob?.cancel()
-        Log.i(TAG, "DownloadJob: $downloadJob")
-
-        if (downloadState == DownloadStatus.Started) {
-            noNetworkConnection()
-        }
-    }
-
-    private fun unzipFile() {
-        binding.txtProgress.text = "Dosya açılıyor"
-        //val destination = "${getDir("packages", Context.MODE_PRIVATE)}/koala/"
-        val destination = "${Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath}/koala/"
-
-        lifecycleScope.launch(Dispatchers.IO) {
-            try {
-                unzip(file, destination)
-            } catch (e: Exception) {
-                Log.e(TAG, "Unzip: ${e.message}")
-            }
-        }
+        Log.i(TAG, "Download ___ Job: $downloadJob")
     }
 
     private fun checkFileExists(): Boolean {
         if (file.exists()) {
-            Log.i(TAG, "Dosya zaten mevcut! ${file.absolutePath}")
+            Log.i(TAG, "File ___ Dosya zaten mevcut! ${file.absolutePath}")
             return true
         } else {
             return false
@@ -199,12 +209,32 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
         downloadJob?.cancel()
         downloadJob = CoroutineScope(Dispatchers.Main).launch {
             downloadState = DownloadStatus.Started
-            binding.frmDownloading.visibility = View.VISIBLE
+
+            binding.lnrDownloadThisBook.visibility = View.GONE
+            binding.lnrDownloading.visibility = View.VISIBLE
+            binding.txtDownloadState.text = getString(R.string.downloading)
+
             viewModel.downloadFile(file, url)
         }
-        Log.i(TAG, "downloadJob: $downloadJob")
+        Log.i(TAG, "Download ___ Job: $downloadJob")
     }
 
+    private fun unzipFile() {
+        binding.lnrDownloadThisBook.visibility = View.GONE
+        binding.lnrDownloading.visibility = View.GONE
+        binding.txtDownloadState.text = "Dosya açılıyor..."
+
+        val destination = "${getDir("packages", Context.MODE_PRIVATE)}/koala"
+        //val destination = "${Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath}/koala"
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                viewModel.unzipFile(file, destination)
+            } catch (e: Exception) {
+                Log.e(TAG, "Unzip ___ ${e.message}")
+            }
+        }
+    }
 
     private fun noNetworkConnection() {
         showDialog(
@@ -215,6 +245,110 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
             positiveButtonCallback = { runJob() },
             negativeButtonCallback = { openWifiSettings() },
         )
+    }
+
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        if (hasFocus) {
+            downloadJob?.let {
+                if (it.isActive) {
+                    hideDialog()
+                }
+            }
+        }
+    }
+
+    private fun setParallaxTransformation(page: View, position: Float) {
+        page.apply {
+            val parallaxView = this.findViewById<CardView>(R.id.crdPager)
+            when {
+                position < -1 -> // [-Infinity,-1)
+                    // This page is way off-screen to the left.
+                    alpha = 1f
+                position <= 1 -> { // [-1,1]
+                    parallaxView.translationX = -position * (width / 2) //Half the normal speed
+                }
+                else -> // (1,+Infinity]
+                    // This page is way off-screen to the right.
+                    alpha = 1f
+            }
+        }
+    }
+
+    private fun permissionRequest() {
+        permissionsLauncher = registerForActivityResult(
+            ActivityResultContracts.RequestMultiplePermissions()
+        ) { permissions ->
+            readPermissionGranted = permissions[Manifest.permission.READ_EXTERNAL_STORAGE] ?: readPermissionGranted
+            writePermissionGranted = permissions[Manifest.permission.WRITE_EXTERNAL_STORAGE] ?: writePermissionGranted
+
+            if (readPermissionGranted) {
+                tempUnit.let { it() }
+            } else {
+                stopJob()
+                binding.lnrDownloading.visibility = View.GONE
+                binding.txtDownloadState.text = getString(R.string.cant_download_book_without_permission)
+                binding.btnDownloadBook.text = getString(R.string.try_again)
+
+                /*
+                Snackbar.make(
+                    binding.root,
+                    getString(R.string.cant_read_files_without_permission),
+                    Snackbar.LENGTH_LONG
+                ).show()
+                 */
+            }
+        }
+
+        /*
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            if (Environment.isExternalStorageManager()) {
+                Toast.makeText(context, "Environment.isExternalStorageManager()", Toast.LENGTH_SHORT).show()
+            } else {
+                //request for the permission
+                val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
+                val uri: Uri = Uri.fromParts("package", packageName, null)
+                intent.data = uri
+                startActivity(intent)
+            }
+        } else {
+            //below android 11=======
+            //startActivity(Intent(this, MainActivity::class.java))
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), 1313)
+        }
+         */
+    }
+
+    private fun updateOrRequestPermissions() {
+        val hasReadPermission = ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+        ) == PackageManager.PERMISSION_GRANTED
+        val hasWritePermission = ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+        ) == PackageManager.PERMISSION_GRANTED
+        val minSdk29 = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
+
+        readPermissionGranted = hasReadPermission
+        writePermissionGranted = hasWritePermission || minSdk29
+
+        val permissionsToRequest = mutableListOf<String>()
+        if (!writePermissionGranted) {
+            permissionsToRequest.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        }
+        if (!readPermissionGranted) {
+            permissionsToRequest.add(Manifest.permission.READ_EXTERNAL_STORAGE)
+        }
+        if (permissionsToRequest.isNotEmpty()) {
+            permissionsLauncher.launch(permissionsToRequest.toTypedArray())
+        }
+
+        //Log.i(TAG, "readPermissionGranted: $readPermissionGranted")
+
+        if (readPermissionGranted) {
+            tempUnit.let { it() }
+        }
     }
 
     private fun showDialog(
@@ -274,103 +408,6 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
                 binding.dialogPositiveButton.text = ""
                 binding.dialogNegativeButton.text = ""
             }
-        }
-    }
-
-
-    override fun onWindowFocusChanged(hasFocus: Boolean) {
-        super.onWindowFocusChanged(hasFocus)
-        if (hasFocus) {
-            downloadJob?.let {
-                if (it.isActive) {
-                    hideDialog()
-                }
-            }
-        }
-    }
-
-
-    private fun setParallaxTransformation(page: View, position: Float) {
-        page.apply {
-            val parallaxView = this.findViewById<CardView>(R.id.crdPager)
-            when {
-                position < -1 -> // [-Infinity,-1)
-                    // This page is way off-screen to the left.
-                    alpha = 1f
-                position <= 1 -> { // [-1,1]
-                    parallaxView.translationX = -position * (width / 2) //Half the normal speed
-                }
-                else -> // (1,+Infinity]
-                    // This page is way off-screen to the right.
-                    alpha = 1f
-            }
-        }
-    }
-
-    private fun permissionRequest() {
-        permissionsLauncher = registerForActivityResult(
-            ActivityResultContracts.RequestMultiplePermissions()
-        ) { permissions ->
-            readPermissionGranted = permissions[Manifest.permission.READ_EXTERNAL_STORAGE] ?: readPermissionGranted
-            writePermissionGranted = permissions[Manifest.permission.WRITE_EXTERNAL_STORAGE] ?: writePermissionGranted
-
-            if (readPermissionGranted) {
-                //tempUnit?.let {it()}
-            } else {
-                val snackbar = Snackbar.make(
-                    binding.root,
-                    getString(R.string.cant_read_files_without_permission),
-                    Snackbar.LENGTH_LONG
-                ).show()
-            }
-        }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            if (Environment.isExternalStorageManager()) {
-                Toast.makeText(context, "Environment.isExternalStorageManager()", Toast.LENGTH_SHORT).show()
-            } else {
-                //request for the permission
-                val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
-                val uri: Uri = Uri.fromParts("package", packageName, null)
-                intent.data = uri
-                startActivity(intent)
-            }
-        } else {
-            //below android 11=======
-            //startActivity(Intent(this, MainActivity::class.java))
-            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), 1313)
-        }
-    }
-
-    private fun updateOrRequestPermissions() {
-        val hasReadPermission = ContextCompat.checkSelfPermission(
-            context,
-            Manifest.permission.READ_EXTERNAL_STORAGE,
-        ) == PackageManager.PERMISSION_GRANTED
-        val hasWritePermission = ContextCompat.checkSelfPermission(
-            context,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE
-        ) == PackageManager.PERMISSION_GRANTED
-        val minSdk29 = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
-
-        readPermissionGranted = hasReadPermission
-        writePermissionGranted = hasWritePermission || minSdk29
-
-        val permissionsToRequest = mutableListOf<String>()
-        if (!writePermissionGranted) {
-            permissionsToRequest.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-        }
-        if (!readPermissionGranted) {
-            permissionsToRequest.add(Manifest.permission.READ_EXTERNAL_STORAGE)
-        }
-        if (permissionsToRequest.isNotEmpty()) {
-            permissionsLauncher.launch(permissionsToRequest.toTypedArray())
-        }
-
-        //Log.i(TAG, "readPermissionGranted: $readPermissionGranted")
-
-        if (readPermissionGranted) {
-            //tempUnit?.let { it() }
         }
     }
 }

@@ -33,7 +33,7 @@ object KtorClient {
         install(HttpTimeout) {
             socketTimeoutMillis = 30_000
             connectTimeoutMillis = 30_000
-            requestTimeoutMillis = 30_000
+            requestTimeoutMillis = 60_000
         }
     }
 }

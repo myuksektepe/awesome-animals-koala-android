@@ -1,8 +1,9 @@
 <resources>
-    <string name="app_name">Koala | Muhteşem Hayvanlar</string>
+    <string name="app_name">Koala</string>
 
     <string name="lipsum" translatable="false">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec quis maximus eros. Praesent finibus vel nisl volutpat interdum. Maecenas dapibus molestie consequat. Vivamus scelerisque metus ac dolor ullamcorper, in blandit tellus ullamcorper. Quisque varius lacus a mauris ullamcorper tristique. Aliquam nec odio pellentesque, pulvinar purus porttitor, congue eros. Suspendisse potenti. Nullam nec nulla et est aliquet viverra et non nisl. Etiam viverra consectetur mauris in viverra.</string>
     <string name="warning">Uyarı</string>
+    <string name="there_is_a_problem">Bir sorun oluştu!</string>
     <string name="error">Hata</string>
     <string name="ok">Tamam</string>
     <string name="yes">Evet</string>
@@ -19,8 +20,16 @@
     <string name="downloading">İndiriliyor…</string>
     <string name="quick_search">Hızlı arama…</string>
 
+
+    <string name="open_this_book">Kitabı açılsın mı?</string>
+    <string name="download_this_book">Bu kitap indirilsin mi?</string>
+    <string name="book_downloaded">Kitap indirildi :)</string>
+
     <string name="network_connection_error_title">İnternet Bağlantı Hatası</string>
     <string name="network_connection_error_message">İnternet bağlantısı olmadığı için şu anda işleme devam edilemiyor. Yeniden denemek ister misiniz?</string>
     <string name="go_to_settings">Ayarlara Git</string>
+
     <string name="cant_read_files_without_permission">İzin verilmediği için dosyalar okunamıyor. Lütfen izni onaylayın.</string>
+
+    <string name="cant_download_book_without_permission">İzin verilmediği için kitap indirilemiyor.\nLütfen izni onaylayın.</string>
 </resources>

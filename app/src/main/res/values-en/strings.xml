@@ -1,8 +1,9 @@
 <resources>
-    <string name="app_name">Koala | Awesome Animals</string>
+    <string name="app_name">Koala</string>
 
     <string name="warning">Warning</string>
     <string name="error">Error</string>
+    <string name="there_is_a_problem">There is a problem!</string>
     <string name="ok">Ok</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
@@ -18,8 +19,15 @@
     <string name="downloading">Downloading…</string>
     <string name="quick_search">Quick Search…</string>
 
+    <string name="open_this_book">Open this book?</string>
+    <string name="download_this_book">Download this book?</string>
+    <string name="book_downloaded">The book downloaded :)</string>
+
     <string name="network_connection_error_title">Network Connection Error</string>
     <string name="network_connection_error_message">We can not contiune cause there is no network connection. Could you try again?</string>
     <string name="go_to_settings">Go to Settings</string>
-    <string name="cant_read_files_without_permission">Can\'t read files without permission. Please confirm the permission.</string>
+
+    <string name="cant_read_files_without_permission">Can\'t read files without permission.\n\nPlease confirm the permission.</string>
+
+    <string name="cant_download_book_without_permission">Can\'t download book without permission.\nPlease confirm the permission.</string>
 </resources>

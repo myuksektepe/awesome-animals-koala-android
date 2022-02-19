@@ -4,8 +4,15 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import awesome.animals.koala.domain.model.UnzipStatus
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.runBlocking
 import java.io.*
 import java.util.zip.ZipFile
+import kotlin.math.roundToInt
 
 fun getJsonDataFromAsset(context: Context, fileName: String): String? {
     val jsonString: String
@@ -37,50 +44,51 @@ object UnzipUtils {
      * @throws IOException
      */
     @Throws(IOException::class)
-    fun unzip(zipFilePath: File, destDirectory: String) {
-        Log.i(TAG, destDirectory)
+    fun unzip(zipFilePath: File, destDirectory: String): Flow<UnzipStatus> = channelFlow {
+        Log.i(TAG, "Unzip ___ $destDirectory")
+        runBlocking {
+            try {
+                File(destDirectory).run {
+                    if (!exists()) {
+                        Log.i(TAG, "Unzip ___ Klasör bulunamadı.")
 
-        try {
-            File(destDirectory).run {
-                if (!exists()) {
-                    Log.i(TAG, "Klasör bulunamadı.")
-
-                    if (mkdirs()) {
-                        Log.i(TAG, "Klasör oluşturuldu.")
+                        if (mkdirs()) {
+                            Log.i(TAG, "Unzip ___ Klasör oluşturuldu.")
+                        } else {
+                            Log.i(TAG, "Unzip ___ Klasör oluşturulamadı!")
+                        }
                     } else {
-                        Log.i(TAG, "Klasör oluşturulamadı!")
+                        Log.i(TAG, "Unzip ___ Klasör bulundu.")
                     }
-                } else {
-                    Log.i(TAG, "Klasör bulundu.")
-                }
-            }
-        } catch (e: Exception) {
-            Log.e(TAG, "Mkdir: ${e.message}")
-        }
-
-
-        ZipFile(zipFilePath).use { zip ->
-
-            zip.entries().asSequence().forEach { entry ->
-
-                zip.getInputStream(entry).use { input ->
-
-                    val filePath = destDirectory + File.separator + entry.name
-
-                    if (!entry.isDirectory) {
-                        // if the entry is a file, extracts it
-                        extractFile(input, filePath)
-                    } else {
-                        // if the entry is a directory, make the directory
-                        val dir = File(filePath)
-                        dir.mkdir()
-                    }
-
                 }
 
+                ZipFile(zipFilePath).use { zip ->
+                    val entires = zip.entries().asSequence()
+                    entires.forEachIndexed { index, entry ->
+                        zip.getInputStream(entry).use { input ->
+                            val filePath = destDirectory + File.separator + entry.name
+                            if (!entry.isDirectory) {
+                                // if the entry is a file, extracts it
+                                extractFile(input, filePath)
+                            } else {
+                                // if the entry is a directory, make the directory
+                                val dir = File(filePath)
+                                dir.mkdir()
+                            }
+                        }
+                        val progress = ((index.toFloat() / entires.count().toFloat()) * 100f).roundToInt()
+                        send(UnzipStatus.Progress(progress))
+                    }
+                    Log.i(TAG, "Unzip ___ Tüm dosyalar eklendi")
+                    send(UnzipStatus.Success)
+                }
+
+            } catch (e: Exception) {
+                Log.e(TAG, "Unzip ___ Mkdir: ${e.message}")
+                send(UnzipStatus.Error(e.message!!))
             }
         }
-    }
+    }.flowOn(Dispatchers.IO)
 
     /**
      * Extracts a zip entry (file entry)
@@ -90,6 +98,8 @@ object UnzipUtils {
      */
     @Throws(IOException::class)
     private fun extractFile(inputStream: InputStream, destFilePath: String) {
+        Log.i(TAG, "Unzip ___ Eklendi: $destFilePath")
+
         val bos = BufferedOutputStream(FileOutputStream(destFilePath))
         val bytesIn = ByteArray(BUFFER_SIZE)
         var read: Int

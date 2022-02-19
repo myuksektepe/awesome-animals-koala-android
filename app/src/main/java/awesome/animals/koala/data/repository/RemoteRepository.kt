@@ -35,7 +35,7 @@ object RemoteRepository {
 
                 val responseBody: ByteArray = httpResponse.receive()
                 file.writeBytes(responseBody)
-                Log.i(TAG, "A file saved to ${file.path}")
+                Log.i(TAG, "Download ___ Dosya şuraya kaydedildi: ${file.path}")
                 send(DownloadStatus.Success)
 
             } catch (e: Exception) {
