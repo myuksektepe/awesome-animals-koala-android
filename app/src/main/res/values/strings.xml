@@ -18,4 +18,9 @@
     <string name="loading">Yükleniyor…</string>
     <string name="downloading">İndiriliyor…</string>
     <string name="quick_search">Hızlı arama…</string>
+
+    <string name="network_connection_error_title">İnternet Bağlantı Hatası</string>
+    <string name="network_connection_error_message">İnternet bağlantısı olmadığı için şu anda işleme devam edilemiyor. Yeniden denemek ister misiniz?</string>
+    <string name="go_to_settings">Ayarlara Git</string>
+    <string name="cant_read_files_without_permission">İzin verilmediği için dosyalar okunamıyor. Lütfen izni onaylayın.</string>
 </resources>

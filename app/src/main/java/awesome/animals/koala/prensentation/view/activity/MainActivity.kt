@@ -1,12 +1,23 @@
 package awesome.animals.koala.prensentation.view.activity
 
-import android.annotation.SuppressLint
+import android.Manifest
 import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.os.Environment
+import android.provider.Settings
 import android.util.Log
 import android.view.View
+import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.cardview.widget.CardView
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import awesome.animals.koala.R
@@ -15,12 +26,17 @@ import awesome.animals.koala.domain.model.DownloadStatus
 import awesome.animals.koala.prensentation.base.BaseActivity
 import awesome.animals.koala.prensentation.viewmodel.MainActivityViewModel
 import awesome.animals.koala.util.TAG
+import awesome.animals.koala.util.UnzipUtils.unzip
 import awesome.animals.koala.util.ViewExtensions.animBounce
 import awesome.animals.koala.util.ViewExtensions.animFadeIn
 import awesome.animals.koala.util.ViewExtensions.animFadeOut
 import awesome.animals.koala.util.openWifiSettings
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import java.io.File
 
 
@@ -35,6 +51,12 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
     private var downloadJob: Job? = null
     private val url = "https://api.rit.im/obi-dahi/awesome-animals/koala/package.zip"
     private lateinit var file: File
+    private var downloadState: DownloadStatus? = null
+
+    private var readPermissionGranted = false
+    private var writePermissionGranted = false
+    private lateinit var permissionsLauncher: ActivityResultLauncher<Array<String>>
+
 
     override fun obverseViewModel() {
         networkConnection.observe(viewLifeCycleOwner) {
@@ -42,15 +64,10 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
 
             when (it) {
                 false -> {
-                    downloadJob?.cancel()
-                    Log.i(TAG, "DownloadJob: $downloadJob")
-                    noNetworkConnection()
+                    stopJob()
                 }
                 true -> {
-                    hideDialog()
-                    runBlocking {
-                        downloadWithFlow()
-                    }
+                    runJob()
                 }
             }
         }
@@ -59,6 +76,7 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
             when (it) {
                 is DownloadStatus.Success -> {
                     binding.txtProgress.text = "İndirme Başarılı: ${it}"
+                    unzipFile()
                 }
                 is DownloadStatus.Error -> {
                     binding.txtProgress.text = it.message
@@ -66,6 +84,7 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
                 is DownloadStatus.Progress -> {
                     binding.txtProgress.text = "${it.progress}%"
                     binding.progress.progress = it.progress
+                    Log.i(TAG, "Progress: ${it.progress} %")
                 }
             }
         }
@@ -115,59 +134,85 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
         job!!.cancel()
          */
 
-        file = File("${getDir("packages", Context.MODE_APPEND)}/koala.zip")
+
+        permissionRequest()
+        updateOrRequestPermissions()
+
+        file = File("${getDir("packages", Context.MODE_PRIVATE)}/koala.zip")
 
         binding.btnStop.setOnClickListener {
-            downloadJob?.cancel()
-            Log.i(TAG, "DownloadJob: $downloadJob")
+            stopJob()
         }
 
         binding.btnDownload.setOnClickListener {
-            if (checkFileExists()) {
+            runJob()
+        }
+
+    }
+
+    private fun runJob() {
+        hideDialog()
+        if (!checkFileExists()) {
+            if (isNetworkAvailable()) {
                 downloadWithFlow()
+            } else {
+                noNetworkConnection()
+            }
+        } else {
+            unzipFile()
+        }
+    }
+
+    private fun stopJob() {
+        downloadJob?.cancel()
+        Log.i(TAG, "DownloadJob: $downloadJob")
+
+        if (downloadState == DownloadStatus.Started) {
+            noNetworkConnection()
+        }
+    }
+
+    private fun unzipFile() {
+        binding.txtProgress.text = "Dosya açılıyor"
+        //val destination = "${getDir("packages", Context.MODE_PRIVATE)}/koala/"
+        val destination = "${Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath}/koala/"
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                unzip(file, destination)
+            } catch (e: Exception) {
+                Log.e(TAG, "Unzip: ${e.message}")
             }
         }
     }
 
     private fun checkFileExists(): Boolean {
-        //file = File("${getDir("packages", Context.MODE_PRIVATE)}/koala.zip")
         if (file.exists()) {
             Log.i(TAG, "Dosya zaten mevcut! ${file.absolutePath}")
             return true
         } else {
-            return true
+            return false
         }
     }
 
-    @SuppressLint("SetTextI18n")
     private fun downloadWithFlow() {
-        if (isNetworkAvailable()) {
-            downloadJob?.cancel()
-            downloadJob = CoroutineScope(Dispatchers.Main).launch {
-                binding.frmDownloading.visibility = View.VISIBLE
-                //async {
-                    Log.i(TAG, "Dosya indiriliyor...")
-                    viewModel.downloadFile(file, url)
-                //}
-            }
-            Log.i(TAG, "downloadJob: $downloadJob")
-        } else {
-            noNetworkConnection()
+        downloadJob?.cancel()
+        downloadJob = CoroutineScope(Dispatchers.Main).launch {
+            downloadState = DownloadStatus.Started
+            binding.frmDownloading.visibility = View.VISIBLE
+            viewModel.downloadFile(file, url)
         }
+        Log.i(TAG, "downloadJob: $downloadJob")
     }
+
 
     private fun noNetworkConnection() {
         showDialog(
-            title = "İnternet Bağlantı Hatası",
-            message = "İnternet bağlantısı olmadığı için şu anda işleme devam edilemiyor. Yeniden denemek ister misiniz?",
-            positiveButtonText = "Evet",
-            negativeButtonText = "Ayarlara Git",
-            positiveButtonCallback = {
-                hideDialog()
-                runBlocking {
-                    downloadWithFlow()
-                }
-            },
+            title = getString(R.string.network_connection_error_title),
+            message = getString(R.string.network_connection_error_message),
+            positiveButtonText = getString(R.string.yes),
+            negativeButtonText = getString(R.string.go_to_settings),
+            positiveButtonCallback = { runJob() },
             negativeButtonCallback = { openWifiSettings() },
         )
     }
@@ -259,6 +304,73 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
                     // This page is way off-screen to the right.
                     alpha = 1f
             }
+        }
+    }
+
+    private fun permissionRequest() {
+        permissionsLauncher = registerForActivityResult(
+            ActivityResultContracts.RequestMultiplePermissions()
+        ) { permissions ->
+            readPermissionGranted = permissions[Manifest.permission.READ_EXTERNAL_STORAGE] ?: readPermissionGranted
+            writePermissionGranted = permissions[Manifest.permission.WRITE_EXTERNAL_STORAGE] ?: writePermissionGranted
+
+            if (readPermissionGranted) {
+                //tempUnit?.let {it()}
+            } else {
+                val snackbar = Snackbar.make(
+                    binding.root,
+                    getString(R.string.cant_read_files_without_permission),
+                    Snackbar.LENGTH_LONG
+                ).show()
+            }
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            if (Environment.isExternalStorageManager()) {
+                Toast.makeText(context, "Environment.isExternalStorageManager()", Toast.LENGTH_SHORT).show()
+            } else {
+                //request for the permission
+                val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
+                val uri: Uri = Uri.fromParts("package", packageName, null)
+                intent.data = uri
+                startActivity(intent)
+            }
+        } else {
+            //below android 11=======
+            //startActivity(Intent(this, MainActivity::class.java))
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), 1313)
+        }
+    }
+
+    private fun updateOrRequestPermissions() {
+        val hasReadPermission = ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+        ) == PackageManager.PERMISSION_GRANTED
+        val hasWritePermission = ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+        ) == PackageManager.PERMISSION_GRANTED
+        val minSdk29 = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
+
+        readPermissionGranted = hasReadPermission
+        writePermissionGranted = hasWritePermission || minSdk29
+
+        val permissionsToRequest = mutableListOf<String>()
+        if (!writePermissionGranted) {
+            permissionsToRequest.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        }
+        if (!readPermissionGranted) {
+            permissionsToRequest.add(Manifest.permission.READ_EXTERNAL_STORAGE)
+        }
+        if (permissionsToRequest.isNotEmpty()) {
+            permissionsLauncher.launch(permissionsToRequest.toTypedArray())
+        }
+
+        //Log.i(TAG, "readPermissionGranted: $readPermissionGranted")
+
+        if (readPermissionGranted) {
+            //tempUnit?.let { it() }
         }
     }
 }

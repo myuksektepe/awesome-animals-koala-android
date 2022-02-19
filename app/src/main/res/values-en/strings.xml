@@ -17,4 +17,9 @@
     <string name="loading">Loading…</string>
     <string name="downloading">Downloading…</string>
     <string name="quick_search">Quick Search…</string>
+
+    <string name="network_connection_error_title">Network Connection Error</string>
+    <string name="network_connection_error_message">We can not contiune cause there is no network connection. Could you try again?</string>
+    <string name="go_to_settings">Go to Settings</string>
+    <string name="cant_read_files_without_permission">Can\'t read files without permission. Please confirm the permission.</string>
 </resources>
