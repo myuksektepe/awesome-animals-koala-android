@@ -9,7 +9,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.runBlocking
 import java.io.*
 import java.util.zip.ZipFile
 import kotlin.math.roundToInt
@@ -46,47 +45,47 @@ object UnzipUtils {
     @Throws(IOException::class)
     fun unzip(zipFilePath: File, destDirectory: String): Flow<UnzipStatus> = channelFlow {
         Log.i(TAG, "Unzip ___ $destDirectory")
-        runBlocking {
-            try {
-                File(destDirectory).run {
-                    if (!exists()) {
-                        Log.i(TAG, "Unzip ___ Klasör bulunamadı.")
-
-                        if (mkdirs()) {
-                            Log.i(TAG, "Unzip ___ Klasör oluşturuldu.")
-                        } else {
-                            Log.i(TAG, "Unzip ___ Klasör oluşturulamadı!")
-                        }
+        try {
+            File(destDirectory).run {
+                if (!exists()) {
+                    Log.i(TAG, "Unzip ___ Klasör bulunamadı.")
+                    if (mkdirs()) {
+                        Log.i(TAG, "Unzip ___ Klasör oluşturuldu.")
                     } else {
-                        Log.i(TAG, "Unzip ___ Klasör bulundu.")
+                        Log.i(TAG, "Unzip ___ Klasör oluşturulamadı!")
                     }
+                } else {
+                    Log.i(TAG, "Unzip ___ Klasör bulundu.")
                 }
-
-                ZipFile(zipFilePath).use { zip ->
-                    val entires = zip.entries().asSequence()
-                    entires.forEachIndexed { index, entry ->
-                        zip.getInputStream(entry).use { input ->
-                            val filePath = destDirectory + File.separator + entry.name
-                            if (!entry.isDirectory) {
-                                // if the entry is a file, extracts it
-                                extractFile(input, filePath)
-                            } else {
-                                // if the entry is a directory, make the directory
-                                val dir = File(filePath)
-                                dir.mkdir()
-                            }
-                        }
-                        val progress = ((index.toFloat() / entires.count().toFloat()) * 100f).roundToInt()
-                        send(UnzipStatus.Progress(progress))
-                    }
-                    Log.i(TAG, "Unzip ___ Tüm dosyalar eklendi")
-                    send(UnzipStatus.Success)
-                }
-
-            } catch (e: Exception) {
-                Log.e(TAG, "Unzip ___ Mkdir: ${e.message}")
-                send(UnzipStatus.Error(e.message!!))
             }
+
+            ZipFile(zipFilePath).use { zip ->
+                val entires = zip.entries().toList()
+                //Log.i(TAG, "Unzip ___ Entries Count: ${entires.count()}")
+                entires.forEachIndexed { index, entry ->
+                    zip.getInputStream(entry).use { input ->
+                        val filePath = destDirectory + File.separator + entry.name
+                        if (!entry.isDirectory) {
+                            // if the entry is a file, extracts it
+                            extractFile(input, filePath)
+                        } else {
+                            // if the entry is a directory, make the directory
+                            val dir = File(filePath)
+                            dir.mkdir()
+                        }
+                    }
+
+                    val progress = (((index.toFloat() + 1) / entires.size.toFloat()) * 100f).roundToInt()
+                    send(UnzipStatus.Progress(progress))
+                    kotlinx.coroutines.delay(100)
+                }
+                Log.i(TAG, "Unzip ___ Tüm dosyalar eklendi")
+                send(UnzipStatus.Success)
+            }
+
+        } catch (e: Exception) {
+            Log.e(TAG, "Unzip ___ Mkdir: ${e.message}")
+            send(UnzipStatus.Error(e.message!!))
         }
     }.flowOn(Dispatchers.IO)
 

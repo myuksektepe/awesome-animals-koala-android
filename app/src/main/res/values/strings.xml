@@ -32,4 +32,7 @@
     <string name="cant_read_files_without_permission">İzin verilmediği için dosyalar okunamıyor. Lütfen izni onaylayın.</string>
 
     <string name="cant_download_book_without_permission">İzin verilmediği için kitap indirilemiyor.\nLütfen izni onaylayın.</string>
+    <string name="book_is_preparing">Kitap hazırlanıyor…</string>
+    <string name="book_could_not_prepared">Kitap hazırlanamadı!</string>
+    <string name="book_could_not_downloaded">Kitap indirilemedi!</string>
 </resources>

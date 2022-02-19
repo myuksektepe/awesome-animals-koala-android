@@ -114,14 +114,14 @@
 
             <LinearLayout
                 android:id="@+id/lnrDialog"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_margin="32dp"
+                android:layout_margin="50dp"
                 android:background="@drawable/custom_dialog_background"
                 android:gravity="center"
                 android:orientation="vertical"
-                android:padding="50dp">
+                android:padding="30dp">
 
                 <TextView
                     android:id="@+id/dialogTitle"
@@ -134,16 +134,24 @@
                     android:textColor="@color/primary"
                     android:textSize="23sp" />
 
-                <TextView
-                    android:id="@+id/dialogMessage"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="32dp"
-                    android:letterSpacing=".1"
-                    android:text="@string/lipsum"
-                    android:textAlignment="center"
-                    android:textColor="@color/text_color"
-                    android:textSize="17sp" />
+                <androidx.core.widget.NestedScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_marginBottom="16dp"
+                    android:layout_gravity="center"
+                    android:layout_weight="1">
+
+                    <TextView
+                        android:id="@+id/dialogMessage"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="32dp"
+                        android:letterSpacing=".1"
+                        android:text="@string/lipsum"
+                        android:textAlignment="center"
+                        android:textColor="@color/text_color"
+                        android:textSize="17sp" />
+                </androidx.core.widget.NestedScrollView>
 
                 <LinearLayout
                     android:layout_width="wrap_content"

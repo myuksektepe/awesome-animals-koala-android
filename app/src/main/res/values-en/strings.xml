@@ -30,4 +30,7 @@
     <string name="cant_read_files_without_permission">Can\'t read files without permission.\n\nPlease confirm the permission.</string>
 
     <string name="cant_download_book_without_permission">Can\'t download book without permission.\nPlease confirm the permission.</string>
+    <string name="book_is_preparing">The book is preparing…</string>
+    <string name="book_could_not_prepared">The book could not prepared!</string>
+    <string name="book_could_not_downloaded">The book could not downloaded!</string>
 </resources>

@@ -10,6 +10,7 @@ import android.net.Network
 import android.os.Build
 import android.os.Bundle
 import android.os.StrictMode
+import android.util.Log
 import android.view.View
 import android.view.Window
 import android.view.WindowManager
@@ -19,9 +20,8 @@ import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import awesome.animals.koala.R
-import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import awesome.animals.koala.util.TAG
+import java.io.File
 
 abstract class BaseActivity<T : BaseViewModel, B : ViewDataBinding> : AppCompatActivity() {
 
@@ -92,6 +92,14 @@ abstract class BaseActivity<T : BaseViewModel, B : ViewDataBinding> : AppCompatA
     fun showLoading1() = loadingAlertDialog.show()
     fun hideLoading1() = loadingAlertDialog.hide()
 
+    fun checkFileExists(file: File): Boolean {
+        if (file.exists()) {
+            Log.i(TAG, "File ___ Dosya zaten mevcut! ${file.absolutePath}")
+            return true
+        } else {
+            return false
+        }
+    }
 
     fun isNetworkAvailable(): Boolean {
         val connectivityManager = getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager

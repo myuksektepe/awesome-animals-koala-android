@@ -43,10 +43,13 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
     private var job: Job? = null
     private var downloadJob: Job? = null
     private val url = "https://api.rit.im/obi-dahi/awesome-animals/koala/package.zip"
-    private lateinit var file: File
     private var downloadState: DownloadStatus? = null
+    private var unzipState: UnzipStatus? = null
     private var tempUnit: () -> Unit? = { null }
+    private lateinit var packageFile: File
+    private lateinit var destinationFolder: String
 
+    private var downloadPermissionGranted = false
     private var readPermissionGranted = false
     private var writePermissionGranted = false
     private lateinit var permissionsLauncher: ActivityResultLauncher<Array<String>>
@@ -57,11 +60,14 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
             Log.i(TAG, "Network ___ Connection: $it")
             when (it) {
                 false -> {
-                    stopJob()
-                    noNetworkConnection()
+                    if (downloadState == DownloadStatus.Started) {
+                        downloadJob?.cancel()
+                        Log.i(TAG, "Download ___ Job: $downloadJob")
+                        noNetworkConnection()
+                    }
                 }
                 true -> {
-                    if (downloadState == DownloadStatus.Started) {
+                    if (downloadPermissionGranted) {
                         runJob()
                     }
                 }
@@ -73,13 +79,14 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
             when (it) {
                 is DownloadStatus.Success -> {
                     binding.txtDownloadState.text = getString(R.string.completed)
-                    unzipFile()
+                    runJob()
                 }
                 is DownloadStatus.Error -> {
                     binding.lnrDownloading.visibility = View.GONE
                     binding.lnrDownloadThisBook.visibility = View.VISIBLE
-                    binding.txtDownloadState.text = getString(R.string.there_is_a_problem)
+                    binding.txtDownloadState.text = getString(R.string.book_could_not_downloaded)
                     binding.btnDownloadBook.text = getString(R.string.try_again)
+                    tryAgain(getString(R.string.book_could_not_downloaded))
                 }
                 is DownloadStatus.Progress -> {
                     binding.txtProgress.text = "${it.progress}%"
@@ -93,12 +100,14 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
             when (it) {
                 is UnzipStatus.Success -> {
                     binding.txtDownloadState.text = getString(R.string.completed)
+                    openBook()
                 }
                 is UnzipStatus.Error -> {
                     binding.lnrDownloading.visibility = View.GONE
                     binding.lnrDownloadThisBook.visibility = View.VISIBLE
-                    binding.txtDownloadState.text = getString(R.string.there_is_a_problem)
+                    binding.txtDownloadState.text = getString(R.string.book_could_not_prepared)
                     binding.btnDownloadBook.text = getString(R.string.try_again)
+                    tryAgain(getString(R.string.book_could_not_prepared))
                 }
                 is UnzipStatus.Progress -> {
                     binding.txtProgress.text = "${it.progress}%"
@@ -152,60 +161,62 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
         job!!.cancel()
          */
 
-        file = File("${getDir("packages", Context.MODE_PRIVATE)}/koala.zip")
         tempUnit = { runJob() }
-
+        packageFile = File("${getDir("packages", Context.MODE_PRIVATE)}/koala.zip")
+        destinationFolder = "${getDir("packages", Context.MODE_PRIVATE)}/koala"
+        //val destination = "${Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath}/koala"
         permissionRequest()
-        //updateOrRequestPermissions()
 
-        if (checkFileExists()) {
-
-        } else {
-
-        }
-
-        binding.txtDownloadState.text = getString(R.string.download_this_book)
-        binding.lnrDownloadThisBook.visibility = View.VISIBLE
-        binding.btnDownloadBook.setOnClickListener {
-            downloadState = DownloadStatus.Started
-            updateOrRequestPermissions()
-            //runJob()
-        }
-
+        runJob()
     }
 
     private fun runJob() {
         hideDialog()
-        if (!checkFileExists()) {
-            if (isNetworkAvailable()) {
-                downloadWithFlow()
+        if (isBookDownloaded()) {
+            Log.i(TAG, "Book is downloaded")
+            if (isBookExtracted()) {
+                Log.i(TAG, "Book is extracted")
+                openBook()
             } else {
-                noNetworkConnection()
+                Log.i(TAG, "Book is NOT extracted")
+                extractBook()
             }
         } else {
-            binding.txtDownloadState.text = getString(R.string.open_this_book)
-            binding.btnDownloadBook.setOnClickListener {
-                downloadState = DownloadStatus.Success
-                unzipFile()
+            Log.i(TAG, "Book is NOT downloaded")
+            if (downloadPermissionGranted) {
+                Log.i(TAG, "Download permission is granted")
+                if (isNetworkAvailable()) {
+                    Log.i(TAG, "Network is available")
+                    if (readPermissionGranted) {
+                        Log.i(TAG, "Read external storage permission is granted")
+                        downloadBook()
+                    } else {
+                        Log.i(TAG, "Read external storage permission is NOT granted")
+                        updateOrRequestPermissions()
+                    }
+                } else {
+                    Log.i(TAG, "Network is NOT available")
+                    noNetworkConnection()
+                }
+            } else {
+                Log.i(TAG, "Download permission is NOT granted")
+
+                binding.txtDownloadState.text = getString(R.string.download_this_book)
+                binding.lnrDownloadThisBook.visibility = View.VISIBLE
+                binding.btnDownloadBook.setOnClickListener {
+                    downloadPermissionGranted = true
+                    runJob()
+                }
             }
         }
+        Log.i(TAG, "----------------------------------\n")
     }
 
-    private fun stopJob() {
-        downloadJob?.cancel()
-        Log.i(TAG, "Download ___ Job: $downloadJob")
-    }
+    private fun isBookDownloaded(): Boolean = packageFile.exists()
 
-    private fun checkFileExists(): Boolean {
-        if (file.exists()) {
-            Log.i(TAG, "File ___ Dosya zaten mevcut! ${file.absolutePath}")
-            return true
-        } else {
-            return false
-        }
-    }
+    private fun isBookExtracted(): Boolean = (File(destinationFolder).exists() && unzipState == UnzipStatus.Success)
 
-    private fun downloadWithFlow() {
+    private fun downloadBook() {
         downloadJob?.cancel()
         downloadJob = CoroutineScope(Dispatchers.Main).launch {
             downloadState = DownloadStatus.Started
@@ -214,28 +225,30 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
             binding.lnrDownloading.visibility = View.VISIBLE
             binding.txtDownloadState.text = getString(R.string.downloading)
 
-            viewModel.downloadFile(file, url)
+            viewModel.downloadFile(packageFile, url)
         }
         Log.i(TAG, "Download ___ Job: $downloadJob")
     }
 
-    private fun unzipFile() {
+    private fun extractBook() {
         binding.lnrDownloadThisBook.visibility = View.GONE
-        binding.lnrDownloading.visibility = View.GONE
-        binding.txtDownloadState.text = "Dosya açılıyor..."
-
-        val destination = "${getDir("packages", Context.MODE_PRIVATE)}/koala"
-        //val destination = "${Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath}/koala"
+        binding.lnrDownloading.visibility = View.VISIBLE
+        binding.txtDownloadState.text = getString(R.string.book_is_preparing)
 
         lifecycleScope.launch(Dispatchers.IO) {
             try {
-                viewModel.unzipFile(file, destination)
+                viewModel.unzipFile(packageFile, destinationFolder)
             } catch (e: Exception) {
                 Log.e(TAG, "Unzip ___ ${e.message}")
             }
         }
     }
 
+    private fun openBook() {
+        Log.i(TAG, "Open the book bitch!")
+    }
+
+    /* Popup Messages */
     private fun noNetworkConnection() {
         showDialog(
             title = getString(R.string.network_connection_error_title),
@@ -247,17 +260,19 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
         )
     }
 
-    override fun onWindowFocusChanged(hasFocus: Boolean) {
-        super.onWindowFocusChanged(hasFocus)
-        if (hasFocus) {
-            downloadJob?.let {
-                if (it.isActive) {
-                    hideDialog()
-                }
-            }
-        }
+    private fun tryAgain(message: String) {
+        showDialog(
+            title = getString(R.string.warning),
+            message = message,
+            positiveButtonText = getString(R.string.try_again),
+            negativeButtonText = null,
+            positiveButtonCallback = { runJob() },
+            negativeButtonCallback = { null },
+        )
     }
+    /* -------------- */
 
+    
     private fun setParallaxTransformation(page: View, position: Float) {
         page.apply {
             val parallaxView = this.findViewById<CardView>(R.id.crdPager)
@@ -285,18 +300,13 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
             if (readPermissionGranted) {
                 tempUnit.let { it() }
             } else {
-                stopJob()
+                downloadJob?.cancel()
+                Log.i(TAG, "Download ___ Job: $downloadJob")
+
                 binding.lnrDownloading.visibility = View.GONE
                 binding.txtDownloadState.text = getString(R.string.cant_download_book_without_permission)
                 binding.btnDownloadBook.text = getString(R.string.try_again)
-
-                /*
-                Snackbar.make(
-                    binding.root,
-                    getString(R.string.cant_read_files_without_permission),
-                    Snackbar.LENGTH_LONG
-                ).show()
-                 */
+                tryAgain(getString(R.string.cant_download_book_without_permission))
             }
         }
 
@@ -344,13 +354,23 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
             permissionsLauncher.launch(permissionsToRequest.toTypedArray())
         }
 
-        //Log.i(TAG, "readPermissionGranted: $readPermissionGranted")
-
         if (readPermissionGranted) {
             tempUnit.let { it() }
         }
     }
 
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        if (hasFocus) {
+            downloadJob?.let {
+                if (it.isActive) {
+                    hideDialog()
+                }
+            }
+        }
+    }
+
+    /* Custom Dialog */
     private fun showDialog(
         title: String,
         message: String,
@@ -410,4 +430,5 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
             }
         }
     }
+    /* -------------- */
 }
