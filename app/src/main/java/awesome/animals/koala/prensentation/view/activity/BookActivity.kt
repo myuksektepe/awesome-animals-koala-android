@@ -9,6 +9,7 @@ import android.util.Log
 import android.view.View
 import android.widget.RelativeLayout
 import androidx.activity.viewModels
+import androidx.core.view.children
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
@@ -25,12 +26,13 @@ import awesome.animals.koala.util.BOOK_NAME
 import awesome.animals.koala.util.TAG
 import awesome.animals.koala.util.ViewExtensions.animFadeOut
 import awesome.animals.koala.util.ViewExtensions.animSlideInDown
+import awesome.animals.koala.util.animations.ZoomOutPageTransformer
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.io.File
-import java.util.*
-import java.util.concurrent.Executors
-import java.util.concurrent.TimeUnit
 
 @AndroidEntryPoint
 class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookBinding>() {
@@ -41,10 +43,11 @@ class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookBinding>() 
 
     private var currentPage = 0
     private var timeSeconds = 999
-    private var job: Job? = null
+    private var jobTimer: Job? = null
     private val context: Context = this
     private var bookData: BookDataModel? = null
     private var mediaPlayer: MediaPlayer? = null
+    private var buttonClicked = true
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -52,7 +55,7 @@ class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookBinding>() 
 
         bookData = intent.getParcelableExtra("book_data")
 
-        job = lifecycleScope.launchWhenCreated {
+        lifecycleScope.launchWhenCreated {
             val fragmentList = mutableListOf<Fragment>()
             bookData?.let {
 
@@ -76,56 +79,95 @@ class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookBinding>() 
                 // ViewPager
                 binding.viewPager.isUserInputEnabled = false
                 binding.viewPager.run {
-                    currentItem = 1
+                    //currentItem = 0
                     adapter = pageAdapter
-                    //setPageTransformer(DepthPageTransformer())
+                    setPageTransformer(ZoomOutPageTransformer())
+                    /*
                     setPageTransformer { page, position ->
                         setParallaxTransformation(page, position)
                     }
+                     */
                     registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
                         override fun onPageSelected(position: Int) {
                             super.onPageSelected(position)
-                            currentPage = position
-                            Log.i(TAG, "Pager Position: $position")
-                            disableButtons()
-
-                            timer(bookData!!.pages[currentPage].timeSeconds)
+                            Log.i(TAG, "$position")
+                            pageChanged(position)
+                            buttonClicked = false
                         }
                     })
                 }
 
             }
         }
+
+        // Buttons
+        binding.imgNextPage.setOnClickListener { nextPage() }
+        binding.imgPrevPage.setOnClickListener { prevPage() }
     }
 
-    private fun timer(second: Int) {
-        val timeLong = (second * 1000).toLong()
-        Log.i(TAG, "Time Long: $timeLong")
+    private fun pageChanged(pageNumber: Int) {
+        if (buttonClicked) {
+            buttonClicked = false
 
-        Executors.newSingleThreadScheduledExecutor().schedule({
-            enableButtons()
-        }, second.toLong(), TimeUnit.SECONDS)
+            Log.i(TAG, "Page Changed: $pageNumber")
 
-        /*
-        Timer().schedule(timeLong) {
-            enableButtons()
-            Log.i(TAG, "Hurra!")
+            // Disable Buttons
+            disableButtons()
+
+            // Find Page Time
+            val timeLong = (bookData!!.pages[pageNumber].timeSeconds * 1000).toLong()
+            Log.i(TAG, "Time Long: $timeLong")
+
+            jobTimer?.cancel()
+            jobTimer = lifecycleScope.launch(Dispatchers.Main) {
+                delay(timeLong)
+                enableButtons()
+            }
         }
-        */
     }
 
     private fun disableButtons() {
         binding.frmButtons.isEnabled = false
         binding.frmButtons.isClickable = false
+        binding.frmButtons.children.forEach {
+            it.isEnabled = false
+            it.isClickable = false
+        }
         binding.frmButtons.startAnimation(animFadeOut())
+        //binding.frmButtons.visibility = View.GONE
         //binding.frmButtons.alpha = 0f
     }
 
     private fun enableButtons() {
+        binding.frmButtons.visibility = View.VISIBLE
         binding.frmButtons.isEnabled = true
         binding.frmButtons.isClickable = true
+        binding.frmButtons.children.forEach {
+            it.isEnabled = true
+            it.isClickable = true
+        }
         binding.frmButtons.startAnimation(animSlideInDown())
         //binding.frmButtons.alpha = 0f
+    }
+
+    fun nextPage() {
+        if (binding.viewPager.currentItem == (bookData!!.pages.size - 1)) {
+            Log.i(TAG, "nextPage is not dound")
+        } else {
+            binding.viewPager.currentItem = binding.viewPager.currentItem + 1
+            Log.i(TAG, "nextPage")
+            buttonClicked = true
+        }
+    }
+
+    fun prevPage() {
+        if (binding.viewPager.currentItem == 0) {
+            Log.i(TAG, "prevPage is not found")
+        } else {
+            binding.viewPager.currentItem = binding.viewPager.currentItem - 1
+            Log.i(TAG, "prevPage")
+            buttonClicked = true
+        }
     }
 
     override fun onPause() {
@@ -155,6 +197,14 @@ class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookBinding>() 
                 prepare()
                 start()
             }
+        }
+    }
+
+    override fun onBackPressed() {
+        if (binding.viewPager.currentItem == 0) {
+            super.onBackPressed()
+        } else {
+            binding.viewPager.currentItem = binding.viewPager.currentItem - 1
         }
     }
 

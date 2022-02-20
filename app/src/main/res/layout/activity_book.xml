@@ -4,6 +4,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <data>
+
+        <variable
+            name="view"
+            type="awesome.animals.koala.prensentation.view.activity.BookActivity" />
+    </data>
+
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -20,7 +28,8 @@
             android:layout_width="match_parent"
             android:layout_height="170dp"
             android:layout_alignParentBottom="true"
-            android:layout_marginBottom="16dp">
+            android:layout_marginBottom="16dp"
+            android:visibility="gone">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -52,7 +61,7 @@
                     android:layout_width="60dp"
                     android:layout_height="60dp"
                     android:layout_marginRight="10dp"
-                    android:backgroundTint="@color/primary"
+                    android:backgroundTint="@color/nexButton"
                     app:cardCornerRadius="50dp"
                     app:cardElevation="6dp">
 

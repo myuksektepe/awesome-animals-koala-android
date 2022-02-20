@@ -12,4 +12,6 @@
     <color name="secondaryVariant">#FFD558</color>
     <color name="background">#FAFAFA</color>
     <color name="text_color">#232323</color>
+
+    <color name="nexButton">#FF5722</color>
 </resources>
