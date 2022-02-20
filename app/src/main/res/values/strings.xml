@@ -35,4 +35,5 @@
     <string name="book_is_preparing">Kitap hazırlanıyor…</string>
     <string name="book_could_not_prepared">Kitap hazırlanamadı!</string>
     <string name="book_could_not_downloaded">Kitap indirilemedi!</string>
+    <string name="book_data_could_not_fetched">Kitap detayları getirilemedi!</string>
 </resources>

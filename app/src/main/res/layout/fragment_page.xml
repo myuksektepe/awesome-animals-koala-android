@@ -16,6 +16,7 @@
             android:layout_height="200dp"
             android:layout_gravity="bottom|center"
             android:foregroundGravity="center"
+            android:layout_margin="32dp"
             app:cardCornerRadius="32dp"
             app:cardElevation="16dp"
             app:cardUseCompatPadding="false"
@@ -43,10 +44,10 @@
 
 
         <RelativeLayout
-            android:id="@+id/frmBackground"
+            android:id="@+id/rltBackground"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginBottom="160dp">
+            android:layout_marginBottom="0dp">
 
             <VideoView
                 android:id="@+id/videoBackground"

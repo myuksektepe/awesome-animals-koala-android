@@ -33,4 +33,5 @@
     <string name="book_is_preparing">The book is preparing…</string>
     <string name="book_could_not_prepared">The book could not prepared!</string>
     <string name="book_could_not_downloaded">The book could not downloaded!</string>
+    <string name="book_data_could_not_fetched">The book data could not fethced!</string>
 </resources>

@@ -2,6 +2,7 @@ package awesome.animals.koala.prensentation.view.activity
 
 import android.Manifest
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -10,16 +11,18 @@ import android.view.View
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import awesome.animals.koala.R
 import awesome.animals.koala.databinding.ActivityMainBinding
+import awesome.animals.koala.domain.model.BookDataModel
 import awesome.animals.koala.domain.model.DownloadStatus
+import awesome.animals.koala.domain.model.ResultState
 import awesome.animals.koala.domain.model.UnzipStatus
 import awesome.animals.koala.prensentation.base.BaseActivity
 import awesome.animals.koala.prensentation.viewmodel.MainActivityViewModel
+import awesome.animals.koala.util.BOOK_NAME
 import awesome.animals.koala.util.TAG
 import awesome.animals.koala.util.ViewExtensions.animBounce
 import awesome.animals.koala.util.ViewExtensions.animFadeIn
@@ -40,13 +43,14 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
     override var viewLifeCycleOwner: LifecycleOwner = this
 
     private val context: Context = this@MainActivity
-    private var job: Job? = null
+    private var runJob: Job? = null
     private var downloadJob: Job? = null
-    private val url = "https://api.rit.im/obi-dahi/awesome-animals/koala/package.zip"
     private var downloadState: DownloadStatus? = null
     private var unzipState: UnzipStatus? = null
     private var tempUnit: () -> Unit? = { null }
-    private lateinit var packageFile: File
+
+    private var bookData: BookDataModel? = null
+    private var filePackageFile: File? = null
     private lateinit var destinationFolder: String
 
     private var downloadPermissionGranted = false
@@ -70,6 +74,32 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
                     if (downloadPermissionGranted) {
                         runJob()
                     }
+                }
+            }
+        }
+
+        // Book Data Status
+        viewModel.getBookDataState.observe(viewLifeCycleOwner) {
+            when (it) {
+                is ResultState.FAIL -> {
+                    binding.lnrDownloading.visibility = View.GONE
+                    binding.lnrDownloadThisBook.visibility = View.VISIBLE
+                    binding.txtDownloadState.text = getString(R.string.book_data_could_not_fetched)
+                    binding.btnDownloadBook.text = getString(R.string.try_again)
+                    tryAgain(getString(R.string.book_data_could_not_fetched))
+
+                    Log.e(TAG, "getBookData ___ ${it.message}")
+                    hideLoading()
+                }
+                is ResultState.LOADING -> {
+                    Log.i(TAG, "getBookData ___ LOADING")
+                    showLoading()
+                }
+                is ResultState.SUCCESS -> {
+                    bookData = it.data
+                    Log.i(TAG, "getBookData ___ ${bookData.toString()}")
+                    filePackageFile = File("${getDir("packages", Context.MODE_PRIVATE)}/${bookData!!.packageFile}")
+                    hideLoading()
                 }
             }
         }
@@ -119,102 +149,70 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        /*
-        job = lifecycleScope.launchWhenCreated {
-
-            val fragmentList = mutableListOf<Fragment>()
-            val json = getJsonDataFromAsset(context, "koala.json")
-            val gson = Gson().fromJson(json, PagesModel::class.java)
-
-            for (page in gson.pages) {
-                Log.i(TAG, "Page: $page")
-                val pageModel = PageModel(
-                    title = page.title,
-                    message = page.message,
-                    video = page.video,
-                    video_cover = page.video_cover
-                )
-                fragmentList.add(PageFragment.newInstance(pageModel))
-            }
-
-            val pageAdapter = ViewPagerAdapter(this@MainActivity, fragmentList)
-
-            binding.viewPager.run {
-                currentItem = 1
-                adapter = pageAdapter
-                //setPageTransformer(DepthPageTransformer())
-                setPageTransformer { page, position ->
-                    setParallaxTransformation(page, position)
-                }
-                /*
-                registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-                    override fun onPageSelected(position: Int) {
-                        super.onPageSelected(position)
-                        Log.i(TAG, "Pager Position: $position")
-                        //when (position) { }
-                    }
-                })
-                 */
-            }
-
-        }
-        job!!.cancel()
-         */
-
+        filePackageFile = null
         tempUnit = { runJob() }
-        packageFile = File("${getDir("packages", Context.MODE_PRIVATE)}/koala.zip")
-        destinationFolder = "${getDir("packages", Context.MODE_PRIVATE)}/koala"
+        destinationFolder = "${getDir("packages", Context.MODE_PRIVATE)}/$BOOK_NAME"
         //val destination = "${Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath}/koala"
         permissionRequest()
 
         runJob()
     }
 
-    private fun runJob() {
-        hideDialog()
-        if (isBookDownloaded()) {
-            Log.i(TAG, "Book is downloaded")
-            if (isBookExtracted()) {
-                Log.i(TAG, "Book is extracted")
-                openBook()
-            } else {
-                Log.i(TAG, "Book is NOT extracted")
-                extractBook()
-            }
-        } else {
-            Log.i(TAG, "Book is NOT downloaded")
-            if (downloadPermissionGranted) {
-                Log.i(TAG, "Download permission is granted")
-                if (isNetworkAvailable()) {
-                    Log.i(TAG, "Network is available")
-                    if (readPermissionGranted) {
-                        Log.i(TAG, "Read external storage permission is granted")
-                        downloadBook()
-                    } else {
-                        Log.i(TAG, "Read external storage permission is NOT granted")
-                        updateOrRequestPermissions()
-                    }
-                } else {
-                    Log.i(TAG, "Network is NOT available")
-                    noNetworkConnection()
-                }
-            } else {
-                Log.i(TAG, "Download permission is NOT granted")
-
-                binding.txtDownloadState.text = getString(R.string.download_this_book)
-                binding.lnrDownloadThisBook.visibility = View.VISIBLE
-                binding.btnDownloadBook.setOnClickListener {
-                    downloadPermissionGranted = true
-                    runJob()
-                }
-            }
-        }
-        Log.i(TAG, "----------------------------------\n")
+    private suspend fun getBookData() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            viewModel.getBookData()
+        }.join()
     }
 
-    private fun isBookDownloaded(): Boolean = packageFile.exists()
+    private fun runJob() {
+        runJob?.cancel()
+        runJob = lifecycleScope.launch {
+            hideDialog()
+            getBookData()
+            if (filePackageFile != null && isBookDownloaded()) {
+                Log.i(TAG, "Book is downloaded")
+                if (isBookExtracted()) {
+                    Log.i(TAG, "Book is extracted")
+                    openBook()
+                } else {
+                    Log.i(TAG, "Book is NOT extracted")
+                    extractBook()
+                }
+            } else {
+                Log.i(TAG, "Book is NOT downloaded")
+                if (downloadPermissionGranted) {
+                    Log.i(TAG, "Download permission is granted")
+                    if (isNetworkAvailable()) {
+                        Log.i(TAG, "Network is available")
+                        if (readPermissionGranted) {
+                            Log.i(TAG, "Read external storage permission is granted")
+                            downloadBook()
+                        } else {
+                            Log.i(TAG, "Read external storage permission is NOT granted")
+                            updateOrRequestPermissions()
+                        }
+                    } else {
+                        Log.i(TAG, "Network is NOT available")
+                        noNetworkConnection()
+                    }
+                } else {
+                    Log.i(TAG, "Download permission is NOT granted")
 
-    private fun isBookExtracted(): Boolean = (File(destinationFolder).exists() && unzipState == UnzipStatus.Success)
+                    binding.txtDownloadState.text = "${getString(R.string.download_this_book)}\n${bookData!!.packageSize}"
+                    binding.lnrDownloadThisBook.visibility = View.VISIBLE
+                    binding.btnDownloadBook.setOnClickListener {
+                        downloadPermissionGranted = true
+                        runJob()
+                    }
+                }
+            }
+            Log.i(TAG, "----------------------------------\n")
+        }
+    }
+
+    private fun isBookDownloaded(): Boolean = filePackageFile!!.exists()
+
+    private fun isBookExtracted(): Boolean = (File(destinationFolder).exists() && File(destinationFolder).list().size == bookData!!.packageItemsCount)
 
     private fun downloadBook() {
         downloadJob?.cancel()
@@ -225,7 +223,7 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
             binding.lnrDownloading.visibility = View.VISIBLE
             binding.txtDownloadState.text = getString(R.string.downloading)
 
-            viewModel.downloadFile(packageFile, url)
+            viewModel.downloadFile(filePackageFile!!, bookData!!.packageFile)
         }
         Log.i(TAG, "Download ___ Job: $downloadJob")
     }
@@ -237,7 +235,7 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
 
         lifecycleScope.launch(Dispatchers.IO) {
             try {
-                viewModel.unzipFile(packageFile, destinationFolder)
+                viewModel.unzipFile(filePackageFile!!, destinationFolder)
             } catch (e: Exception) {
                 Log.e(TAG, "Unzip ___ ${e.message}")
             }
@@ -245,7 +243,9 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
     }
 
     private fun openBook() {
-        Log.i(TAG, "Open the book bitch!")
+        val intent = Intent(context, BookActivity::class.java)
+        intent.putExtra("book_data", bookData)
+        startActivity(intent)
     }
 
     /* Popup Messages */
@@ -261,6 +261,9 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
     }
 
     private fun tryAgain(message: String) {
+        downloadJob?.cancel()
+        runJob?.cancel()
+
         showDialog(
             title = getString(R.string.warning),
             message = message,
@@ -272,23 +275,6 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
     }
     /* -------------- */
 
-    
-    private fun setParallaxTransformation(page: View, position: Float) {
-        page.apply {
-            val parallaxView = this.findViewById<CardView>(R.id.crdPager)
-            when {
-                position < -1 -> // [-Infinity,-1)
-                    // This page is way off-screen to the left.
-                    alpha = 1f
-                position <= 1 -> { // [-1,1]
-                    parallaxView.translationX = -position * (width / 2) //Half the normal speed
-                }
-                else -> // (1,+Infinity]
-                    // This page is way off-screen to the right.
-                    alpha = 1f
-            }
-        }
-    }
 
     private fun permissionRequest() {
         permissionsLauncher = registerForActivityResult(

@@ -89,8 +89,8 @@ abstract class BaseActivity<T : BaseViewModel, B : ViewDataBinding> : AppCompatA
         }
     }
 
-    fun showLoading1() = loadingAlertDialog.show()
-    fun hideLoading1() = loadingAlertDialog.hide()
+    fun showLoading() = loadingAlertDialog.show()
+    fun hideLoading() = loadingAlertDialog.hide()
 
     fun checkFileExists(file: File): Boolean {
         if (file.exists()) {

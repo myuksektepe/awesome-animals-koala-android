@@ -1,9 +1,11 @@
 plugins {
     id 'com.android.application'
+    id 'kotlin-android'
     id 'org.jetbrains.kotlin.android'
     id 'kotlin-kapt'
-    id 'dagger.hilt.android.plugin'
     id 'kotlin-parcelize'
+    id 'kotlinx-serialization'
+    id 'dagger.hilt.android.plugin'
 }
 
 android {
@@ -39,12 +41,13 @@ android {
 
 dependencies {
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.3'
 
     def appcompat_version = "1.4.1"
     implementation "androidx.appcompat:appcompat:$appcompat_version"
 
-    def metarial_version = "1.5.0"
-    implementation "com.google.android.material:material:$metarial_version"
+    def material_version = "1.5.0"
+    implementation "com.google.android.material:material:$material_version"
 
     def recylerview_version = "1.2.1"
     implementation "androidx.recyclerview:recyclerview:$recylerview_version"
@@ -84,6 +87,9 @@ dependencies {
     def rxbinding_version = "0.4.0"
     implementation "com.jakewharton.rxbinding:rxbinding:$rxbinding_version"
 
+    def serialization_version = "1.3.0"
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:$serialization_version"
+
     def retrofit_version = "2.9.0"
     implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
     implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
@@ -116,4 +122,10 @@ dependencies {
     androidTestImplementation "androidx.test.ext:junit:1.1.3"
     androidTestImplementation "androidx.test.espresso:espresso-core:3.4.0"
     androidTestImplementation "com.google.truth:truth:1.1.3"
+    implementation "androidx.core:core-ktx:+"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+}
+repositories {
+    mavenCentral()
 }
