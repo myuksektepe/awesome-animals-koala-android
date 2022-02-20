@@ -1,6 +1,9 @@
 package awesome.animals.koala.prensentation.view.activity
 
 import android.content.Context
+import android.media.AudioAttributes
+import android.media.MediaPlayer
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -9,6 +12,7 @@ import androidx.activity.viewModels
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
+import androidx.viewpager2.widget.ViewPager2
 import awesome.animals.koala.R
 import awesome.animals.koala.databinding.ActivityBookBinding
 import awesome.animals.koala.domain.model.BookDataModel
@@ -17,9 +21,16 @@ import awesome.animals.koala.prensentation.adapter.ViewPagerAdapter
 import awesome.animals.koala.prensentation.base.BaseActivity
 import awesome.animals.koala.prensentation.view.fragment.PageFragment
 import awesome.animals.koala.prensentation.viewmodel.BookActivityViewModel
+import awesome.animals.koala.util.BOOK_NAME
 import awesome.animals.koala.util.TAG
+import awesome.animals.koala.util.ViewExtensions.animFadeOut
+import awesome.animals.koala.util.ViewExtensions.animSlideInDown
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
+import java.io.File
+import java.util.*
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 
 @AndroidEntryPoint
 class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookBinding>() {
@@ -27,25 +38,26 @@ class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookBinding>() 
     override val viewModel: BookActivityViewModel by viewModels()
     override var viewLifeCycleOwner: LifecycleOwner = this
     override fun obverseViewModel() {}
+
+    private var currentPage = 0
+    private var timeSeconds = 999
     private var job: Job? = null
     private val context: Context = this
     private var bookData: BookDataModel? = null
+    private var mediaPlayer: MediaPlayer? = null
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         bookData = intent.getParcelableExtra("book_data")
 
-
         job = lifecycleScope.launchWhenCreated {
-
             val fragmentList = mutableListOf<Fragment>()
-            //val json = getJsonDataFromAsset(context, "koala.json")
-            //val gson = Gson().fromJson(json, BookDataModel::class.java)
-
             bookData?.let {
+
+                // Pages
                 for (page in it.pages) {
-                    Log.i(TAG, "Page: $page")
                     val pageModel = BookPageModel(
                         title = page.title,
                         message = page.message,
@@ -58,8 +70,11 @@ class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookBinding>() 
                     fragmentList.add(PageFragment.newInstance(pageModel))
                 }
 
+                // Adapter
                 val pageAdapter = ViewPagerAdapter(this@BookActivity, fragmentList)
 
+                // ViewPager
+                binding.viewPager.isUserInputEnabled = false
                 binding.viewPager.run {
                     currentItem = 1
                     adapter = pageAdapter
@@ -67,21 +82,80 @@ class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookBinding>() 
                     setPageTransformer { page, position ->
                         setParallaxTransformation(page, position)
                     }
-                    /*
                     registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
                         override fun onPageSelected(position: Int) {
                             super.onPageSelected(position)
+                            currentPage = position
                             Log.i(TAG, "Pager Position: $position")
-                            //when (position) { }
+                            disableButtons()
+
+                            timer(bookData!!.pages[currentPage].timeSeconds)
                         }
                     })
-                     */
                 }
 
             }
-
         }
-        //job!!.cancel()
+    }
+
+    private fun timer(second: Int) {
+        val timeLong = (second * 1000).toLong()
+        Log.i(TAG, "Time Long: $timeLong")
+
+        Executors.newSingleThreadScheduledExecutor().schedule({
+            enableButtons()
+        }, second.toLong(), TimeUnit.SECONDS)
+
+        /*
+        Timer().schedule(timeLong) {
+            enableButtons()
+            Log.i(TAG, "Hurra!")
+        }
+        */
+    }
+
+    private fun disableButtons() {
+        binding.frmButtons.isEnabled = false
+        binding.frmButtons.isClickable = false
+        binding.frmButtons.startAnimation(animFadeOut())
+        //binding.frmButtons.alpha = 0f
+    }
+
+    private fun enableButtons() {
+        binding.frmButtons.isEnabled = true
+        binding.frmButtons.isClickable = true
+        binding.frmButtons.startAnimation(animSlideInDown())
+        //binding.frmButtons.alpha = 0f
+    }
+
+    override fun onPause() {
+        super.onPause()
+        mediaPlayer?.stop()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Song
+        val destinationFolder = "${getDir("packages", Context.MODE_PRIVATE)}/$BOOK_NAME"
+        val song = "$destinationFolder/${bookData?.song}"
+        if (File(song).exists()) {
+            mediaPlayer?.stop()
+            mediaPlayer?.release()
+            mediaPlayer = null
+            mediaPlayer = MediaPlayer().apply {
+                isLooping = true
+                setVolume(.3f, .3f)
+                setAudioAttributes(
+                    AudioAttributes.Builder()
+                        .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                        .setUsage(AudioAttributes.USAGE_MEDIA)
+                        .build()
+                )
+                setDataSource(context, Uri.parse(song))
+                prepare()
+                start()
+            }
+        }
     }
 
 

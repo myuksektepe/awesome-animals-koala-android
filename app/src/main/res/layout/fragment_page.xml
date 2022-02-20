@@ -13,32 +13,28 @@
         <androidx.cardview.widget.CardView
             android:id="@+id/crdPager"
             android:layout_width="match_parent"
-            android:layout_height="200dp"
+            android:layout_height="170dp"
             android:layout_gravity="bottom|center"
+            android:layout_marginLeft="40dp"
+            android:layout_marginRight="40dp"
+            android:layout_marginBottom="16dp"
             android:foregroundGravity="center"
-            android:layout_margin="32dp"
             app:cardCornerRadius="32dp"
             app:cardElevation="16dp"
             app:cardUseCompatPadding="false"
             app:contentPadding="16dp">
 
             <TextView
-                android:id="@+id/txtPageTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:textAlignment="center"
-                android:textSize="27sp"
-                android:visibility="gone" />
-
-            <TextView
                 android:id="@+id/txtPageMessage"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:letterSpacing=".1"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:gravity="center"
+                android:scrollbars="vertical"
                 android:textAlignment="center"
-                android:textSize="23sp" />
+                android:textSize="25sp" />
 
         </androidx.cardview.widget.CardView>
 

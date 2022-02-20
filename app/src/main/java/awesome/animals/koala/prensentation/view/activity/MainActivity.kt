@@ -71,9 +71,8 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
                     }
                 }
                 true -> {
-                    if (downloadPermissionGranted) {
-                        runJob()
-                    }
+                    runJob()
+                    //if (downloadPermissionGranted) { }
                 }
             }
         }
@@ -99,7 +98,7 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
                     bookData = it.data
                     Log.i(TAG, "getBookData ___ ${bookData.toString()}")
                     filePackageFile = File("${getDir("packages", Context.MODE_PRIVATE)}/${bookData!!.packageFile}")
-                    hideLoading()
+                    runJob()
                 }
             }
         }
@@ -153,60 +152,70 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
         tempUnit = { runJob() }
         destinationFolder = "${getDir("packages", Context.MODE_PRIVATE)}/$BOOK_NAME"
         //val destination = "${Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath}/koala"
-        permissionRequest()
 
+        permissionRequest()
         runJob()
     }
 
-    private suspend fun getBookData() {
-        lifecycleScope.launch(Dispatchers.IO) {
-            viewModel.getBookData()
-        }.join()
-    }
 
     private fun runJob() {
         runJob?.cancel()
         runJob = lifecycleScope.launch {
             hideDialog()
-            getBookData()
-            if (filePackageFile != null && isBookDownloaded()) {
-                Log.i(TAG, "Book is downloaded")
-                if (isBookExtracted()) {
-                    Log.i(TAG, "Book is extracted")
-                    openBook()
+            hideLoading()
+
+            bookData?.let {
+                if (filePackageFile != null && isBookDownloaded()) {
+                    Log.i(TAG, "Book is downloaded")
+                    if (isBookExtracted()) {
+                        Log.i(TAG, "Book is extracted")
+                        openBook()
+                    } else {
+                        Log.i(TAG, "Book is NOT extracted")
+                        extractBook()
+                    }
                 } else {
-                    Log.i(TAG, "Book is NOT extracted")
-                    extractBook()
-                }
-            } else {
-                Log.i(TAG, "Book is NOT downloaded")
-                if (downloadPermissionGranted) {
-                    Log.i(TAG, "Download permission is granted")
-                    if (isNetworkAvailable()) {
-                        Log.i(TAG, "Network is available")
-                        if (readPermissionGranted) {
-                            Log.i(TAG, "Read external storage permission is granted")
-                            downloadBook()
+                    Log.i(TAG, "Book is NOT downloaded")
+                    if (downloadPermissionGranted) {
+                        Log.i(TAG, "Download permission is granted")
+                        if (isNetworkAvailable()) {
+                            Log.i(TAG, "Network is available")
+                            if (readPermissionGranted) {
+                                Log.i(TAG, "Read external storage permission is granted")
+                                downloadBook()
+                            } else {
+                                Log.i(TAG, "Read external storage permission is NOT granted")
+                                updateOrRequestPermissions()
+                            }
                         } else {
-                            Log.i(TAG, "Read external storage permission is NOT granted")
-                            updateOrRequestPermissions()
+                            Log.i(TAG, "Network is NOT available")
+                            noNetworkConnection()
                         }
                     } else {
-                        Log.i(TAG, "Network is NOT available")
-                        noNetworkConnection()
-                    }
-                } else {
-                    Log.i(TAG, "Download permission is NOT granted")
+                        Log.i(TAG, "Download permission is NOT granted")
 
-                    binding.txtDownloadState.text = "${getString(R.string.download_this_book)}\n${bookData!!.packageSize}"
-                    binding.lnrDownloadThisBook.visibility = View.VISIBLE
-                    binding.btnDownloadBook.setOnClickListener {
-                        downloadPermissionGranted = true
-                        runJob()
+                        binding.txtDownloadState.text = "${getString(R.string.download_this_book)}\n${bookData!!.packageSize}"
+                        binding.lnrDownloadThisBook.visibility = View.VISIBLE
+                        binding.btnDownloadBook.setOnClickListener {
+                            downloadPermissionGranted = true
+                            runJob()
+                        }
                     }
                 }
+            } ?: run {
+                getBookData()
+                Log.i(TAG, "Book data is null")
             }
+
             Log.i(TAG, "----------------------------------\n")
+        }
+    }
+
+    private suspend fun getBookData() {
+        if (isNetworkAvailable()) {
+            viewModel.getBookData()
+        } else {
+            noNetworkConnection()
         }
     }
 

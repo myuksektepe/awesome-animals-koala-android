@@ -20,6 +20,7 @@ import awesome.animals.koala.util.ViewExtensions.animFadeOut
 import awesome.animals.koala.util.ViewExtensions.animSlideInDown
 import com.bumptech.glide.Glide
 import dagger.hilt.android.AndroidEntryPoint
+import java.io.File
 
 
 private const val TITLE = "title"
@@ -38,7 +39,6 @@ class PageFragment : BaseFragment<PageFragmentViewModel, FragmentPageBinding>() 
     //private var video_cover: String? = null
 
     private lateinit var pageModel: BookPageModel
-    private lateinit var destinationFolder: String
     private lateinit var video: String
     private lateinit var video_cover: String
     private lateinit var voice: String
@@ -60,22 +60,22 @@ class PageFragment : BaseFragment<PageFragmentViewModel, FragmentPageBinding>() 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        destinationFolder = "${requireActivity().getDir("packages", Context.MODE_PRIVATE)}/$BOOK_NAME"
+        val destinationFolder = "${requireActivity().getDir("packages", Context.MODE_PRIVATE)}/$BOOK_NAME"
         video = "$destinationFolder/${pageModel.video}"
         video_cover = "$destinationFolder/${pageModel.video_cover}"
         voice = "$destinationFolder/${pageModel.voice}"
 
         // Title
-        binding.txtPageTitle.text = pageModel.title
+        //binding.txtPageTitle.text = pageModel.title
 
         // Message
         binding.txtPageMessage.text = pageModel.message
 
         // Video Cover Image
-        video_cover.let {
+        if (File(video_cover).exists()) {
             Glide
                 .with(requireContext())
-                .load(it)
+                .load(video_cover)
                 .centerCrop()
                 .into(binding.imageBackground)
         }
@@ -85,12 +85,11 @@ class PageFragment : BaseFragment<PageFragmentViewModel, FragmentPageBinding>() 
         super.onResume()
 
         // Video
-        video.let {
+        if (File(video).exists()) {
             binding.videoBackground.apply {
-                setVideoPath(it)
+                setVideoPath(video)
                 start()
                 setOnPreparedListener {
-                    Log.i(TAG, "setOnCompletionListener")
                     it.isLooping = true
 
                     val videoRatio = it.videoWidth / it.videoHeight.toFloat()
@@ -103,7 +102,6 @@ class PageFragment : BaseFragment<PageFragmentViewModel, FragmentPageBinding>() 
                     }
                 }
                 setOnCompletionListener {
-                    Log.i(TAG, "setOnCompletionListener")
                     it.start()
                 }
                 setOnErrorListener { mp, what, extra ->
@@ -113,9 +111,6 @@ class PageFragment : BaseFragment<PageFragmentViewModel, FragmentPageBinding>() 
                     true
                 }
                 setOnInfoListener { mp, what, extra ->
-                    Log.i(TAG, "setOnInfoListener what: $what")
-                    Log.i(TAG, "setOnInfoListener extra: $extra")
-
                     if (what == MediaPlayer.MEDIA_INFO_VIDEO_RENDERING_START) {
                         binding.imageBackground.startAnimation(requireContext().animFadeOut())
                         true
@@ -123,15 +118,16 @@ class PageFragment : BaseFragment<PageFragmentViewModel, FragmentPageBinding>() 
                     false
                 }
             }
-
         }
 
+
         // Voice
-        voice.let {
+        if (File(voice).exists()) {
             mediaPlayer?.stop()
             mediaPlayer?.release()
             mediaPlayer = null
             mediaPlayer = MediaPlayer().apply {
+                setVolume(1f, 1f)
                 setAudioAttributes(
                     AudioAttributes.Builder()
                         .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
