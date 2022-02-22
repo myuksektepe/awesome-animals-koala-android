@@ -3,9 +3,8 @@ package awesome.animals.koala.prensentation.adapter
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
-import androidx.viewpager2.widget.ViewPager2
 
-class ViewPagerAdapter(
+class ViewPager2Adapter(
     fragmentActivity: FragmentActivity,
     private val fragmentList: List<Fragment>,
 ) : FragmentStateAdapter(fragmentActivity) {

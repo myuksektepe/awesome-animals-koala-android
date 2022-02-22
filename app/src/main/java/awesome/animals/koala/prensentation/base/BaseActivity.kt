@@ -73,8 +73,8 @@ abstract class BaseActivity<T : BaseViewModel, B : ViewDataBinding> : AppCompatA
     }
 
     override fun onDestroy() {
-        super.onDestroy()
         _binding = null
+        super.onDestroy()
     }
 
 

@@ -88,7 +88,7 @@ class PageFragment : BaseFragment<PageFragmentViewModel, FragmentPageBinding>() 
         if (File(video).exists()) {
             binding.videoBackground.apply {
                 setVideoPath(video)
-                start()
+                //start()
                 setOnPreparedListener {
                     it.isLooping = true
 
@@ -100,6 +100,8 @@ class PageFragment : BaseFragment<PageFragmentViewModel, FragmentPageBinding>() 
                     } else {
                         this.scaleY = 1f / scaleX
                     }
+
+                    it.start()
                 }
                 setOnCompletionListener {
                     it.start()

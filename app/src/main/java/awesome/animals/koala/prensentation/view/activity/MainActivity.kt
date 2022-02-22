@@ -72,7 +72,6 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
                 }
                 true -> {
                     runJob()
-                    //if (downloadPermissionGranted) { }
                 }
             }
         }
@@ -86,13 +85,10 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
                     binding.txtDownloadState.text = getString(R.string.book_data_could_not_fetched)
                     binding.btnDownloadBook.text = getString(R.string.try_again)
                     tryAgain(getString(R.string.book_data_could_not_fetched))
-
                     Log.e(TAG, "getBookData ___ ${it.message}")
-                    hideLoading()
                 }
                 is ResultState.LOADING -> {
                     Log.i(TAG, "getBookData ___ LOADING")
-                    showLoading()
                 }
                 is ResultState.SUCCESS -> {
                     bookData = it.data
@@ -159,11 +155,11 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
 
 
     private fun runJob() {
+        hideDialog()
+        hideLoading()
+
         runJob?.cancel()
         runJob = lifecycleScope.launch {
-            hideDialog()
-            hideLoading()
-
             bookData?.let {
                 if (filePackageFile != null && isBookDownloaded()) {
                     Log.i(TAG, "Book is downloaded")
@@ -203,8 +199,10 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
                     }
                 }
             } ?: run {
-                getBookData()
-                Log.i(TAG, "Book data is null")
+                if (bookData == null) {
+                    getBookData()
+                    Log.i(TAG, "Book data is null")
+                }
             }
 
             Log.i(TAG, "----------------------------------\n")
@@ -272,6 +270,8 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
     private fun tryAgain(message: String) {
         downloadJob?.cancel()
         runJob?.cancel()
+        hideLoading()
+        hideDialog()
 
         showDialog(
             title = getString(R.string.warning),
@@ -296,6 +296,7 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
                 tempUnit.let { it() }
             } else {
                 downloadJob?.cancel()
+                hideDialog()
                 Log.i(TAG, "Download ___ Job: $downloadJob")
 
                 binding.lnrDownloading.visibility = View.GONE

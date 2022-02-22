@@ -18,7 +18,7 @@ import awesome.animals.koala.R
 import awesome.animals.koala.databinding.ActivityBookBinding
 import awesome.animals.koala.domain.model.BookDataModel
 import awesome.animals.koala.domain.model.BookPageModel
-import awesome.animals.koala.prensentation.adapter.ViewPagerAdapter
+import awesome.animals.koala.prensentation.adapter.ViewPager2Adapter
 import awesome.animals.koala.prensentation.base.BaseActivity
 import awesome.animals.koala.prensentation.view.fragment.PageFragment
 import awesome.animals.koala.prensentation.viewmodel.BookActivityViewModel
@@ -26,9 +26,9 @@ import awesome.animals.koala.util.BOOK_NAME
 import awesome.animals.koala.util.TAG
 import awesome.animals.koala.util.ViewExtensions.animFadeOut
 import awesome.animals.koala.util.ViewExtensions.animSlideInDown
-import awesome.animals.koala.util.animations.ZoomOutPageTransformer
+import awesome.animals.koala.util.ViewExtensions.nextPage
+import awesome.animals.koala.util.ViewExtensions.previousPage
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -56,73 +56,76 @@ class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookBinding>() 
         bookData = intent.getParcelableExtra("book_data")
 
         lifecycleScope.launchWhenCreated {
+
             val fragmentList = mutableListOf<Fragment>()
+            fragmentList.clear()
+
             bookData?.let {
 
                 // Pages
                 for (page in it.pages) {
-                    val pageModel = BookPageModel(
-                        title = page.title,
-                        message = page.message,
-                        video = page.video,
-                        video_cover = page.video_cover,
-                        voice = page.voice,
-                        timeSeconds = page.timeSeconds,
-                        is_active = page.is_active
-                    )
-                    fragmentList.add(PageFragment.newInstance(pageModel))
+                    if (page.is_active) {
+                        val pageModel = BookPageModel(
+                            title = page.title,
+                            message = page.message,
+                            video = page.video,
+                            video_cover = page.video_cover,
+                            voice = page.voice,
+                            timeSeconds = page.timeSeconds,
+                            is_active = page.is_active
+                        )
+                        fragmentList.add(PageFragment.newInstance(pageModel))
+                    }
                 }
 
                 // Adapter
-                val pageAdapter = ViewPagerAdapter(this@BookActivity, fragmentList)
+                val pageAdapter = ViewPager2Adapter(this@BookActivity, fragmentList)
 
-                // ViewPager
-                binding.viewPager.isUserInputEnabled = false
-                binding.viewPager.run {
-                    //currentItem = 0
+                // ViewPager 2
+                binding.viewPager2.apply {
+                    currentItem = currentPage
+                    offscreenPageLimit = 1
+                    isUserInputEnabled = false
                     adapter = pageAdapter
-                    setPageTransformer(ZoomOutPageTransformer())
+                    //setPageTransformer(ZoomOutPageTransformer())
                     /*
                     setPageTransformer { page, position ->
                         setParallaxTransformation(page, position)
                     }
                      */
-                    registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-                        override fun onPageSelected(position: Int) {
-                            super.onPageSelected(position)
-                            Log.i(TAG, "$position")
-                            pageChanged(position)
-                            buttonClicked = false
-                        }
-                    })
+                    registerOnPageChangeCallback(viewpagerPageChangeCallback)
                 }
 
+
+                pageChanged(currentPage)
             }
         }
 
         // Buttons
-        binding.imgNextPage.setOnClickListener { nextPage() }
-        binding.imgPrevPage.setOnClickListener { prevPage() }
+        binding.imgNextPage.setOnClickListener { binding.viewPager2.nextPage() }
+        binding.imgPrevPage.setOnClickListener { binding.viewPager2.previousPage() }
     }
 
     private fun pageChanged(pageNumber: Int) {
-        if (buttonClicked) {
-            buttonClicked = false
+        Log.i(TAG, "Page Changed: $pageNumber")
 
-            Log.i(TAG, "Page Changed: $pageNumber")
+        /*
+        binding.viewPager.doOnPreDraw {
+            binding.viewPager.setCurrentItem(pageNumber, true)
+        }
+         */
 
-            // Disable Buttons
-            disableButtons()
+        // Disable Buttons
+        disableButtons()
 
-            // Find Page Time
-            val timeLong = (bookData!!.pages[pageNumber].timeSeconds * 1000).toLong()
-            Log.i(TAG, "Time Long: $timeLong")
+        // Find Page Time
+        val timeLong = (bookData!!.pages[pageNumber].timeSeconds * 1000).toLong()
+        Log.i(TAG, "Time Long: $timeLong")
 
-            jobTimer?.cancel()
-            jobTimer = lifecycleScope.launch(Dispatchers.Main) {
-                delay(timeLong)
-                enableButtons()
-            }
+        jobTimer?.cancel()
+        jobTimer = lifecycleScope.launch {
+            delay(timeLong)
+            enableButtons()
         }
     }
 
@@ -133,6 +136,8 @@ class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookBinding>() 
             it.isEnabled = false
             it.isClickable = false
         }
+        binding.imgPrevPage.isClickable = false
+        binding.imgNextPage.isClickable = false
         binding.frmButtons.startAnimation(animFadeOut())
         //binding.frmButtons.visibility = View.GONE
         //binding.frmButtons.alpha = 0f
@@ -142,32 +147,14 @@ class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookBinding>() 
         binding.frmButtons.visibility = View.VISIBLE
         binding.frmButtons.isEnabled = true
         binding.frmButtons.isClickable = true
+        binding.imgPrevPage.isClickable = true
+        binding.imgNextPage.isClickable = true
         binding.frmButtons.children.forEach {
             it.isEnabled = true
             it.isClickable = true
         }
         binding.frmButtons.startAnimation(animSlideInDown())
         //binding.frmButtons.alpha = 0f
-    }
-
-    fun nextPage() {
-        if (binding.viewPager.currentItem == (bookData!!.pages.size - 1)) {
-            Log.i(TAG, "nextPage is not dound")
-        } else {
-            binding.viewPager.currentItem = binding.viewPager.currentItem + 1
-            Log.i(TAG, "nextPage")
-            buttonClicked = true
-        }
-    }
-
-    fun prevPage() {
-        if (binding.viewPager.currentItem == 0) {
-            Log.i(TAG, "prevPage is not found")
-        } else {
-            binding.viewPager.currentItem = binding.viewPager.currentItem - 1
-            Log.i(TAG, "prevPage")
-            buttonClicked = true
-        }
     }
 
     override fun onPause() {
@@ -186,7 +173,7 @@ class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookBinding>() 
             mediaPlayer = null
             mediaPlayer = MediaPlayer().apply {
                 isLooping = true
-                setVolume(.3f, .3f)
+                setVolume(.2f, .2f)
                 setAudioAttributes(
                     AudioAttributes.Builder()
                         .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
@@ -200,11 +187,23 @@ class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookBinding>() 
         }
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        //binding.viewPager2.unregisterOnPageChangeCallback(viewpagerPageChangeCallback)
+    }
+
+    var viewpagerPageChangeCallback = object : ViewPager2.OnPageChangeCallback() {
+        override fun onPageSelected(position: Int) {
+            pageChanged(position)
+            Log.i(TAG, "ViewPager ___ Position: $position")
+        }
+    }
+
     override fun onBackPressed() {
-        if (binding.viewPager.currentItem == 0) {
+        if (binding.viewPager2.currentItem == 0) {
             super.onBackPressed()
         } else {
-            binding.viewPager.currentItem = binding.viewPager.currentItem - 1
+            //binding.viewPager2.currentItem = binding.viewPager2.currentItem - 1
         }
     }
 

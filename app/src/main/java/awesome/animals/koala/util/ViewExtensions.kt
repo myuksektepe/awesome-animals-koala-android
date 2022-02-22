@@ -8,6 +8,7 @@ import android.view.Window
 import android.view.animation.AnimationUtils
 import android.widget.Button
 import android.widget.TextView
+import androidx.viewpager2.widget.ViewPager2
 import awesome.animals.koala.R
 
 object ViewExtensions {
@@ -69,5 +70,30 @@ object ViewExtensions {
         }
 
         dialog.show()
+    }
+
+
+    fun ViewPager2.nextPage(smoothScroll: Boolean = true): Boolean {
+        if ((currentItem + 1) < adapter?.itemCount ?: 0) {
+            this.post {
+                //Timer().schedule(1000) { }
+                setCurrentItem(currentItem + 1, smoothScroll)
+            }
+            return true
+        }
+        //can't move to next page, maybe current page is last or adapter not set.
+        return false
+    }
+
+    fun ViewPager2.previousPage(smoothScroll: Boolean = true): Boolean {
+        if ((currentItem - 1) >= 0) {
+            //Timer().schedule(1000) {}
+            this.post {
+                setCurrentItem(currentItem - 1, smoothScroll)
+            }
+            return true
+        }
+        //can't move to previous page, maybe current page is first or adapter not set.
+        return false
     }
 }
