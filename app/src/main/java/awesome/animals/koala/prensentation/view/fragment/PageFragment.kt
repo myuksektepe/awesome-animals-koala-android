@@ -16,6 +16,7 @@ import awesome.animals.koala.prensentation.base.BaseFragment
 import awesome.animals.koala.prensentation.viewmodel.PageFragmentViewModel
 import awesome.animals.koala.util.BOOK_NAME
 import awesome.animals.koala.util.TAG
+import awesome.animals.koala.util.ViewExtensions.animFadeIn
 import awesome.animals.koala.util.ViewExtensions.animFadeOut
 import awesome.animals.koala.util.ViewExtensions.animSlideInDown
 import com.bumptech.glide.Glide
@@ -32,12 +33,6 @@ private const val PAGE_MODEL = "page_model"
 
 @AndroidEntryPoint
 class PageFragment : BaseFragment<PageFragmentViewModel, FragmentPageBinding>() {
-
-    //private var title: String? = null
-    //private var message: String? = null
-    //private var video: String? = null
-    //private var video_cover: String? = null
-
     private lateinit var pageModel: BookPageModel
     private lateinit var video: String
     private lateinit var video_cover: String
@@ -50,9 +45,6 @@ class PageFragment : BaseFragment<PageFragmentViewModel, FragmentPageBinding>() 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            //title = it.getString(TITLE)
-            //message = it.getString(MESSAGE)
-            //video = it.getString(video)
             pageModel = it.getParcelable("page_model")!!
         }
     }
@@ -65,9 +57,6 @@ class PageFragment : BaseFragment<PageFragmentViewModel, FragmentPageBinding>() 
         video_cover = "$destinationFolder/${pageModel.video_cover}"
         voice = "$destinationFolder/${pageModel.voice}"
 
-        // Title
-        //binding.txtPageTitle.text = pageModel.title
-
         // Message
         binding.txtPageMessage.text = pageModel.message
 
@@ -79,6 +68,7 @@ class PageFragment : BaseFragment<PageFragmentViewModel, FragmentPageBinding>() 
                 .centerCrop()
                 .into(binding.imageBackground)
         }
+
     }
 
     override fun onResume() {
@@ -87,8 +77,8 @@ class PageFragment : BaseFragment<PageFragmentViewModel, FragmentPageBinding>() 
         // Video
         if (File(video).exists()) {
             binding.videoBackground.apply {
+                visibility = View.VISIBLE
                 setVideoPath(video)
-                //start()
                 setOnPreparedListener {
                     it.isLooping = true
 
@@ -100,16 +90,16 @@ class PageFragment : BaseFragment<PageFragmentViewModel, FragmentPageBinding>() 
                     } else {
                         this.scaleY = 1f / scaleX
                     }
-
+                    //setZOrderOnTop(true)
                     it.start()
                 }
                 setOnCompletionListener {
-                    it.start()
+                    binding.videoBackground.visibility = View.VISIBLE
                 }
                 setOnErrorListener { mp, what, extra ->
                     Log.e(TAG, "setOnErrorListener what: $what")
                     Log.e(TAG, "setOnErrorListener extra: $extra")
-                    binding.imageBackground.visibility = View.VISIBLE
+                    binding.videoBackground.visibility = View.GONE
                     true
                 }
                 setOnInfoListener { mp, what, extra ->
@@ -139,6 +129,7 @@ class PageFragment : BaseFragment<PageFragmentViewModel, FragmentPageBinding>() 
                 setDataSource(requireContext(), Uri.parse(voice))
                 prepare()
                 start()
+                setOnErrorListener { mp, what, extra -> true }
             }
         }
 
@@ -152,20 +143,20 @@ class PageFragment : BaseFragment<PageFragmentViewModel, FragmentPageBinding>() 
     override fun onPause() {
         super.onPause()
         mediaPlayer?.stop()
+        binding.videoBackground.apply {
+            stopPlayback()
+            visibility = View.GONE
+        }
+        binding.imageBackground.startAnimation(requireContext().animFadeIn())
     }
 
     companion object {
         @JvmStatic
         fun newInstance(
-            //title: String, message: String, image: String?
             pageModel: BookPageModel
         ) =
             PageFragment().apply {
                 arguments = Bundle().apply {
-                    //putString(TITLE, title)
-                    //putString(MESSAGE, message)
-                    //putString(video, image)
-
                     putParcelable(PAGE_MODEL, pageModel as Parcelable)
                 }
             }

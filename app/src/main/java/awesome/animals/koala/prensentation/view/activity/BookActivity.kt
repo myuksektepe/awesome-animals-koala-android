@@ -96,7 +96,6 @@ class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookBinding>() 
                     registerOnPageChangeCallback(viewpagerPageChangeCallback)
                 }
 
-
                 pageChanged(currentPage)
             }
         }
@@ -109,12 +108,6 @@ class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookBinding>() 
     private fun pageChanged(pageNumber: Int) {
         Log.i(TAG, "Page Changed: $pageNumber")
 
-        /*
-        binding.viewPager.doOnPreDraw {
-            binding.viewPager.setCurrentItem(pageNumber, true)
-        }
-         */
-
         // Disable Buttons
         disableButtons()
 
@@ -124,7 +117,7 @@ class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookBinding>() 
 
         jobTimer?.cancel()
         jobTimer = lifecycleScope.launch {
-            delay(timeLong)
+            delay(100)
             enableButtons()
         }
     }
@@ -183,6 +176,7 @@ class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookBinding>() 
                 setDataSource(context, Uri.parse(song))
                 prepare()
                 start()
+                setOnErrorListener { mp, what, extra -> true }
             }
         }
     }
