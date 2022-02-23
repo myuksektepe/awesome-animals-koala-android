@@ -112,12 +112,13 @@ class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookBinding>() 
         disableButtons()
 
         // Find Page Time
-        val timeLong = (bookData!!.pages[pageNumber].timeSeconds * 1000).toLong()
+        val seconds = bookData!!.pages[pageNumber].timeSeconds + 1
+        val timeLong = (seconds * 1000).toLong()
         Log.i(TAG, "Time Long: $timeLong")
 
         jobTimer?.cancel()
         jobTimer = lifecycleScope.launch {
-            delay(100)
+            delay(timeLong)
             enableButtons()
         }
     }

@@ -9,6 +9,7 @@ import android.os.Parcelable
 import android.util.Log
 import android.view.View
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import awesome.animals.koala.R
 import awesome.animals.koala.databinding.FragmentPageBinding
 import awesome.animals.koala.domain.model.BookPageModel
@@ -21,6 +22,8 @@ import awesome.animals.koala.util.ViewExtensions.animFadeOut
 import awesome.animals.koala.util.ViewExtensions.animSlideInDown
 import com.bumptech.glide.Glide
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.io.File
 
 
@@ -128,8 +131,12 @@ class PageFragment : BaseFragment<PageFragmentViewModel, FragmentPageBinding>() 
                 )
                 setDataSource(requireContext(), Uri.parse(voice))
                 prepare()
-                start()
+                //start()
                 setOnErrorListener { mp, what, extra -> true }
+            }
+            lifecycleScope.launch {
+                delay(1000)
+                mediaPlayer!!.start()
             }
         }
 
