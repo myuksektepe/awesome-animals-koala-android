@@ -250,9 +250,13 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
     }
 
     private fun openBook() {
-        val intent = Intent(context, BookActivity::class.java)
-        intent.putExtra("book_data", bookData)
-        startActivity(intent)
+        binding.lnrOpenTheBook.visibility = View.VISIBLE
+        binding.txtDownloadState.text = getString(R.string.open_this_book)
+        binding.btnOpenBook.setOnClickListener {
+            val intent = Intent(context, BookActivity::class.java)
+            intent.putExtra("book_data", bookData)
+            startActivity(intent)
+        }
     }
 
     /* Popup Messages */

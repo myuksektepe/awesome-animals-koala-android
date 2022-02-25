@@ -70,7 +70,7 @@ object ViewExtensions {
             }
         }
 
-        dialog.show()
+        if (!dialog.isShowing) dialog.show()
     }
 
 

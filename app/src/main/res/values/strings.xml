@@ -21,7 +21,8 @@
     <string name="quick_search">Hızlı arama…</string>
 
 
-    <string name="open_this_book">Kitabı açılsın mı?</string>
+    <string name="open_the_book">Kitabı Aç</string>
+    <string name="open_this_book">Kitap açılsın mı?</string>
     <string name="download_this_book">Bu kitap indirilsin mi?</string>
     <string name="book_downloaded">Kitap indirildi :)</string>
 
@@ -39,6 +40,8 @@
     <string name="next_page">Sonraki Sayfa</string>
     <string name="prev_page">Önceki Sayfa</string>
     <string name="exit">Çıkış</string>
-    <string name="prev_icon"><![CDATA[<]]></string>
-    <string name="next_icon"><![CDATA[>]]></string>
+    <string name="prev_icon" translatable="false"><![CDATA[<]]></string>
+    <string name="next_icon" translatable="false"><![CDATA[>]]></string>
+    <string name="are_you_sure">Emin Misiniz?</string>
+    <string name="exit_to_book">Kitabı kapatmak istediğinize emin misiniz?</string>
 </resources>

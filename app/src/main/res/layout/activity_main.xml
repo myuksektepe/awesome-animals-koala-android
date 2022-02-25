@@ -94,6 +94,26 @@
 
                 </LinearLayout>
 
+                <!-- Open The Book -->
+                <LinearLayout
+                    android:id="@+id/lnrOpenTheBook"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+                    <Button
+                        android:id="@+id/btnOpenBook"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:letterSpacing=".1"
+                        android:maxLines="1"
+                        android:text="@string/yes"
+                        android:textSize="16sp" />
+                </LinearLayout>
+
             </LinearLayout>
         </FrameLayout>
 

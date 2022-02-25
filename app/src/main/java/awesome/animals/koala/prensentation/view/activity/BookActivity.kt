@@ -1,14 +1,15 @@
 package awesome.animals.koala.prensentation.view.activity
 
 import android.content.Context
+import android.content.res.Configuration
 import android.media.AudioAttributes
 import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.RelativeLayout
 import androidx.activity.viewModels
+import androidx.core.content.ContextCompat
 import androidx.core.view.children
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
@@ -28,6 +29,7 @@ import awesome.animals.koala.util.ViewExtensions.animFadeOut
 import awesome.animals.koala.util.ViewExtensions.animSlideInDown
 import awesome.animals.koala.util.ViewExtensions.nextPage
 import awesome.animals.koala.util.ViewExtensions.previousPage
+import awesome.animals.koala.util.ViewExtensions.showCustomDialog
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -42,16 +44,23 @@ class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookBinding>() 
     override fun obverseViewModel() {}
 
     private var currentPage = 0
-    private var timeSeconds = 999
+    private var mediaPlayerLength = 0
     private var jobTimer: Job? = null
     private val context: Context = this
     private var bookData: BookDataModel? = null
     private var mediaPlayer: MediaPlayer? = null
-    private var buttonClicked = true
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        when (context.resources?.configuration?.uiMode?.and(Configuration.UI_MODE_NIGHT_MASK)) {
+            Configuration.UI_MODE_NIGHT_YES -> {
+                binding.imgBackground.setColorFilter(ContextCompat.getColor(context, R.color.black_90), android.graphics.PorterDuff.Mode.MULTIPLY)
+            }
+            Configuration.UI_MODE_NIGHT_NO -> {}
+            Configuration.UI_MODE_NIGHT_UNDEFINED -> {}
+        }
 
         bookData = intent.getParcelableExtra("book_data")
 
@@ -103,6 +112,30 @@ class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookBinding>() 
         // Buttons
         binding.btnNext.setOnClickListener { binding.viewPager2.nextPage() }
         binding.btnPrev.setOnClickListener { binding.viewPager2.previousPage() }
+        binding.btnMute.setOnClickListener { button ->
+            mediaPlayer?.let {
+                if (it.isPlaying) {
+                    it.pause()
+                    mediaPlayerLength = it.currentPosition
+                    button.setBackgroundResource(R.drawable.ic_music_off)
+                } else {
+                    it.seekTo(mediaPlayerLength)
+                    it.start()
+                    button.setBackgroundResource(R.drawable.ic_music_on)
+                }
+            }
+        }
+        binding.btnExit.setOnClickListener {
+            showCustomDialog(
+                title = getString(R.string.are_you_sure),
+                message = getString(R.string.exit_to_book),
+                cancelable = false,
+                positiveButtonText = getString(R.string.no),
+                negativeButtonText = getString(R.string.yes),
+                positiveButtonCallback = { null },
+                negativeButtonCallback = { finish() }
+            )
+        }
     }
 
     private fun pageChanged(pageNumber: Int) {
@@ -177,17 +210,12 @@ class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookBinding>() 
                 setDataSource(context, Uri.parse(song))
                 prepare()
                 start()
-                setOnErrorListener { mp, what, extra -> true }
+                setOnErrorListener { _, _, _ -> true }
             }
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        //binding.viewPager2.unregisterOnPageChangeCallback(viewpagerPageChangeCallback)
-    }
-
-    var viewpagerPageChangeCallback = object : ViewPager2.OnPageChangeCallback() {
+    private var viewpagerPageChangeCallback = object : ViewPager2.OnPageChangeCallback() {
         override fun onPageSelected(position: Int) {
             pageChanged(position)
             Log.i(TAG, "ViewPager ___ Position: $position")
@@ -202,7 +230,7 @@ class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookBinding>() 
         }
     }
 
-
+    /*
     private fun setParallaxTransformation(page: View, position: Float) {
         page.apply {
             val parallaxView = this.findViewById<RelativeLayout>(R.id.rltBackground)
@@ -219,4 +247,5 @@ class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookBinding>() 
             }
         }
     }
+     */
 }

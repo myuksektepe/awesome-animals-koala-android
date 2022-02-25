@@ -31,6 +31,7 @@
             android:layout_marginBottom="32dp"
             android:letterSpacing=".1"
             android:text="@string/lipsum"
+            android:textAlignment="center"
             android:textColor="@color/text_color"
             android:textSize="17sp" />
 
@@ -46,6 +47,7 @@
                 android:letterSpacing=".1"
                 android:maxLines="1"
                 android:text="@string/cancel"
+                android:textAllCaps="false"
                 android:textSize="16sp"
                 app:backgroundTint="@android:color/holo_orange_dark" />
 
@@ -58,8 +60,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:letterSpacing=".1"
-                android:text="@string/ok"
                 android:maxLines="1"
+                android:text="@string/ok"
+                android:textAllCaps="false"
                 android:textSize="16sp" />
         </LinearLayout>
 

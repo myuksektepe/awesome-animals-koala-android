@@ -11,110 +11,122 @@
             type="awesome.animals.koala.prensentation.view.activity.BookActivity" />
     </data>
 
-
-    <LinearLayout
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        tools:context=".prensentation.view.activity.BookActivity">
+        android:layout_height="match_parent">
 
-        <!-- Top Buttons -->
+        <ImageView
+            android:id="@+id/imgBackground"
+            android:layout_marginTop="70dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/background" />
+
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="16dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginRight="16dp"
-            android:orientation="horizontal">
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            tools:context=".prensentation.view.activity.BookActivity">
 
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/imgExit"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:contentDescription="@string/exit"
-                android:src="@drawable/ic_close" />
-
-            <View
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1" />
-
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/imgMute"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:contentDescription="@string/exit"
-                android:src="@drawable/ic_music_off" />
-
-        </LinearLayout>
-
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <!-- ViewPager-->
-            <androidx.viewpager2.widget.ViewPager2
-                android:id="@+id/viewPager2"
+            <!-- Top Buttons -->
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                app:userInputEnabled="@{false}" />
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginRight="16dp"
+                android:orientation="horizontal">
 
-            <!-- Bottom Bottoms -->
+                <ImageView
+                    android:id="@+id/btnExit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/ic_close"
+                    android:contentDescription="@string/exit" />
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
+
+                <ImageView
+                    android:id="@+id/btnMute"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/ic_music_on"
+                    android:contentDescription="@string/exit" />
+
+            </LinearLayout>
+
             <FrameLayout
-                android:id="@+id/frmButtons"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom"
-                android:layout_margin="16dp"
-                android:visibility="visible">
+                android:layout_height="match_parent">
 
-                <LinearLayout
+                <!-- ViewPager-->
+                <androidx.viewpager2.widget.ViewPager2
+                    android:id="@+id/viewPager2"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@color/transparent"
+                    app:userInputEnabled="@{false}" />
+
+                <!-- Bottom Bottoms -->
+                <FrameLayout
+                    android:id="@+id/frmButtons"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="bottom"
-                    android:gravity="center"
-                    android:orientation="horizontal">
+                    android:layout_margin="16dp"
+                    android:visibility="visible">
 
-                    <Button
-                        android:id="@+id/btnPrev"
-                        android:layout_width="wrap_content"
-                        android:layout_height="70dp"
-                        android:layout_weight="1"
-                        android:background="@drawable/button"
-                        android:paddingBottom="20dp"
-                        android:shadowColor="@color/black_70"
-                        android:shadowDx="1"
-                        android:shadowDy="3"
-                        android:shadowRadius="6"
-                        android:text="@string/prev_icon"
-                        android:textAllCaps="false"
-                        android:textSize="30sp" />
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom"
+                        android:gravity="center"
+                        android:orientation="horizontal">
 
-                    <View
-                        android:layout_width="0dp"
-                        android:layout_height="0dp"
-                        android:layout_weight="1" />
+                        <Button
+                            android:id="@+id/btnPrev"
+                            android:layout_width="wrap_content"
+                            android:layout_height="70dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/button"
+                            android:paddingBottom="20dp"
+                            android:shadowColor="@color/black_70"
+                            android:shadowDx="1"
+                            android:shadowDy="3"
+                            android:shadowRadius="6"
+                            android:text="@string/prev_icon"
+                            android:textAllCaps="false"
+                            android:textSize="30sp" />
 
-                    <Button
-                        android:id="@+id/btnNext"
-                        android:layout_width="wrap_content"
-                        android:layout_height="70dp"
-                        android:layout_weight="1"
-                        android:background="@drawable/button"
-                        android:paddingBottom="20dp"
-                        android:shadowColor="@color/black_70"
-                        android:shadowDx="1"
-                        android:shadowDy="3"
-                        android:shadowRadius="6"
-                        android:text="@string/next_icon"
-                        android:textAllCaps="false"
-                        android:textSize="30sp" />
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="0dp"
+                            android:layout_weight="1" />
 
-                </LinearLayout>
+                        <Button
+                            android:id="@+id/btnNext"
+                            android:layout_width="wrap_content"
+                            android:layout_height="70dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/button"
+                            android:paddingBottom="20dp"
+                            android:shadowColor="@color/black_70"
+                            android:shadowDx="1"
+                            android:shadowDy="3"
+                            android:shadowRadius="6"
+                            android:text="@string/next_icon"
+                            android:textAllCaps="false"
+                            android:textSize="30sp" />
+
+                    </LinearLayout>
+                </FrameLayout>
+
             </FrameLayout>
 
-        </FrameLayout>
-
-    </LinearLayout>
+        </LinearLayout>
+    </FrameLayout>
 
 </layout>

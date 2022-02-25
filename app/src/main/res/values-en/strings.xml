@@ -19,6 +19,7 @@
     <string name="downloading">Downloading…</string>
     <string name="quick_search">Quick Search…</string>
 
+    <string name="open_the_book">Open The Book</string>
     <string name="open_this_book">Open this book?</string>
     <string name="download_this_book">Download this book?</string>
     <string name="book_downloaded">The book downloaded :)</string>
@@ -37,4 +38,6 @@
     <string name="next_page">Next Page</string>
     <string name="prev_page">Prev Page</string>
     <string name="exit">Exit</string>
+    <string name="are_you_sure">Are You Sure?</string>
+    <string name="exit_to_book">You are about exit to book, are you sure?</string>
 </resources>
