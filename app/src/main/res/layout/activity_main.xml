@@ -30,7 +30,7 @@
                     android:layout_margin="16dp"
                     android:clipToPadding="true"
                     app:cardCornerRadius="16dp"
-                    app:cardElevation="8dp">
+                    app:cardElevation="16dp">
 
                     <ImageView
                         android:layout_width="match_parent"
@@ -151,8 +151,8 @@
                 <androidx.core.widget.NestedScrollView
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
-                    android:layout_marginBottom="16dp"
                     android:layout_gravity="center"
+                    android:layout_marginBottom="16dp"
                     android:layout_weight="1">
 
                     <TextView
@@ -179,6 +179,7 @@
                         android:letterSpacing=".1"
                         android:maxLines="1"
                         android:text="@string/cancel"
+                        android:textAllCaps="false"
                         android:textSize="16sp"
                         app:backgroundTint="@android:color/holo_orange_dark" />
 
@@ -193,6 +194,7 @@
                         android:letterSpacing=".1"
                         android:maxLines="1"
                         android:text="@string/ok"
+                        android:textAllCaps="false"
                         android:textSize="16sp" />
                 </LinearLayout>
 

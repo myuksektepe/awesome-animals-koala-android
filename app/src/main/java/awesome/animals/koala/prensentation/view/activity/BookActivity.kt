@@ -125,17 +125,7 @@ class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookBinding>() 
                 }
             }
         }
-        binding.btnExit.setOnClickListener {
-            showCustomDialog(
-                title = getString(R.string.are_you_sure),
-                message = getString(R.string.exit_to_book),
-                cancelable = false,
-                positiveButtonText = getString(R.string.no),
-                negativeButtonText = getString(R.string.yes),
-                positiveButtonCallback = { null },
-                negativeButtonCallback = { finish() }
-            )
-        }
+        binding.btnExit.setOnClickListener { closeBook() }
     }
 
     private fun pageChanged(pageNumber: Int) {
@@ -184,6 +174,25 @@ class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookBinding>() 
         //binding.frmButtons.alpha = 0f
     }
 
+    private var viewpagerPageChangeCallback = object : ViewPager2.OnPageChangeCallback() {
+        override fun onPageSelected(position: Int) {
+            pageChanged(position)
+            Log.i(TAG, "ViewPager ___ Position: $position")
+        }
+    }
+
+    private fun closeBook() {
+        showCustomDialog(
+            title = getString(R.string.are_you_sure),
+            message = getString(R.string.exit_to_book),
+            cancelable = false,
+            positiveButtonText = getString(R.string.no),
+            negativeButtonText = getString(R.string.yes),
+            positiveButtonCallback = { null },
+            negativeButtonCallback = { finish() }
+        )
+    }
+
     override fun onPause() {
         super.onPause()
         mediaPlayer?.stop()
@@ -215,16 +224,10 @@ class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookBinding>() 
         }
     }
 
-    private var viewpagerPageChangeCallback = object : ViewPager2.OnPageChangeCallback() {
-        override fun onPageSelected(position: Int) {
-            pageChanged(position)
-            Log.i(TAG, "ViewPager ___ Position: $position")
-        }
-    }
-
     override fun onBackPressed() {
         if (binding.viewPager2.currentItem == 0) {
-            super.onBackPressed()
+            //super.onBackPressed()
+            closeBook()
         } else {
             //binding.viewPager2.currentItem = binding.viewPager2.currentItem - 1
         }

@@ -250,6 +250,7 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
     }
 
     private fun openBook() {
+        binding.lnrDownloading.visibility = View.GONE
         binding.lnrOpenTheBook.visibility = View.VISIBLE
         binding.txtDownloadState.text = getString(R.string.open_this_book)
         binding.btnOpenBook.setOnClickListener {
