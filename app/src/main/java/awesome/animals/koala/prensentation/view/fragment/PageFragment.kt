@@ -20,17 +20,12 @@ import awesome.animals.koala.util.TAG
 import awesome.animals.koala.util.ViewExtensions.animFadeIn
 import awesome.animals.koala.util.ViewExtensions.animFadeOut
 import awesome.animals.koala.util.ViewExtensions.animSlideInDown
+import awesome.animals.koala.util.ViewExtensions.animSlideInUp
 import com.bumptech.glide.Glide
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.File
-
-
-private const val TITLE = "title"
-private const val MESSAGE = "message"
-private const val VIDEO = "video"
-private const val VIDEO_COVER = "video_cover"
 
 private const val PAGE_MODEL = "page_model"
 
@@ -61,7 +56,7 @@ class PageFragment : BaseFragment<PageFragmentViewModel, FragmentPageBinding>() 
         voice = "$destinationFolder/${pageModel.voice}"
 
         // Message
-        binding.txtPageMessage.text = pageModel.message
+        binding.txtPageMessage.text = ""
 
         // Video Cover Image
         if (File(video_cover).exists()) {
@@ -142,7 +137,8 @@ class PageFragment : BaseFragment<PageFragmentViewModel, FragmentPageBinding>() 
 
         binding.txtPageMessage.run {
             visibility = View.VISIBLE
-            startAnimation(requireContext().animSlideInDown())
+            this.text = pageModel.message
+            startAnimation(requireContext().animSlideInUp())
         }
 
     }

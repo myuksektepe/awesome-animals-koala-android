@@ -12,120 +12,109 @@
     </data>
 
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:orientation="vertical"
         tools:context=".prensentation.view.activity.BookActivity">
 
-        <androidx.viewpager2.widget.ViewPager2
-            android:id="@+id/viewPager2"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:userInputEnabled="@{false}" />
-
-        <!-- Buttons -->
+        <!-- Top Buttons -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginRight="16dp"
             android:orientation="horizontal">
 
-            <androidx.cardview.widget.CardView
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:layout_margin="15dp"
-                android:backgroundTint="@color/background"
-                app:cardCornerRadius="50dp"
-                app:cardElevation="6dp">
-
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/imgExit"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:contentDescription="@string/exit"
-                    android:src="@drawable/ic_close" />
-            </androidx.cardview.widget.CardView>
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/imgExit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/exit"
+                android:src="@drawable/ic_close" />
 
             <View
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:layout_weight="1" />
 
-            <androidx.cardview.widget.CardView
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:layout_margin="15dp"
-                android:backgroundTint="@color/background"
-                app:cardCornerRadius="50dp"
-                app:cardElevation="6dp">
-
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/imgMute"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:contentDescription="@string/exit"
-                    android:src="@drawable/ic_music_off" />
-            </androidx.cardview.widget.CardView>
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/imgMute"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/exit"
+                android:src="@drawable/ic_music_off" />
 
         </LinearLayout>
 
-
         <FrameLayout
-            android:id="@+id/frmButtons"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_alignParentBottom="true"
-            android:visibility="visible">
+            android:layout_height="match_parent">
 
-            <LinearLayout
+            <!-- ViewPager-->
+            <androidx.viewpager2.widget.ViewPager2
+                android:id="@+id/viewPager2"
                 android:layout_width="match_parent"
-                android:layout_height="170dp"
+                android:layout_height="match_parent"
+                app:userInputEnabled="@{false}" />
+
+            <!-- Bottom Bottoms -->
+            <FrameLayout
+                android:id="@+id/frmButtons"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_gravity="bottom"
-                android:layout_marginBottom="16dp"
-                android:gravity="center"
-                android:orientation="horizontal">
+                android:layout_margin="16dp"
+                android:visibility="visible">
 
-                <androidx.cardview.widget.CardView
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:layout_marginStart="10dp"
-                    android:backgroundTint="@color/background"
-                    app:cardCornerRadius="50dp"
-                    app:cardElevation="6dp">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:gravity="center"
+                    android:orientation="horizontal">
 
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/imgPrevPage"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:contentDescription="@string/prev_page"
-                        android:src="@drawable/ic_left" />
-                </androidx.cardview.widget.CardView>
+                    <Button
+                        android:id="@+id/btnPrev"
+                        android:layout_width="wrap_content"
+                        android:layout_height="70dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/button"
+                        android:paddingBottom="20dp"
+                        android:shadowColor="@color/black_70"
+                        android:shadowDx="1"
+                        android:shadowDy="3"
+                        android:shadowRadius="6"
+                        android:text="@string/prev_icon"
+                        android:textAllCaps="false"
+                        android:textSize="30sp" />
 
-                <View
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:layout_weight="1" />
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:layout_weight="1" />
 
-                <androidx.cardview.widget.CardView
-                    android:layout_width="60dp"
-                    android:layout_height="60dp"
-                    android:layout_marginEnd="10dp"
-                    android:backgroundTint="@color/nexButton"
-                    app:cardCornerRadius="60dp"
-                    app:cardElevation="6dp">
+                    <Button
+                        android:id="@+id/btnNext"
+                        android:layout_width="wrap_content"
+                        android:layout_height="70dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/button"
+                        android:paddingBottom="20dp"
+                        android:shadowColor="@color/black_70"
+                        android:shadowDx="1"
+                        android:shadowDy="3"
+                        android:shadowRadius="6"
+                        android:text="@string/next_icon"
+                        android:textAllCaps="false"
+                        android:textSize="30sp" />
 
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/imgNextPage"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:contentDescription="@string/next_page"
-                        android:src="@drawable/ic_right"
-                        app:tint="@color/white" />
-                </androidx.cardview.widget.CardView>
+                </LinearLayout>
+            </FrameLayout>
 
-            </LinearLayout>
         </FrameLayout>
 
-    </RelativeLayout>
+    </LinearLayout>
 
 </layout>

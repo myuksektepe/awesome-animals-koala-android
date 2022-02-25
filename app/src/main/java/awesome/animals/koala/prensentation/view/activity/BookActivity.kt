@@ -101,8 +101,8 @@ class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookBinding>() 
         }
 
         // Buttons
-        binding.imgNextPage.setOnClickListener { binding.viewPager2.nextPage() }
-        binding.imgPrevPage.setOnClickListener { binding.viewPager2.previousPage() }
+        binding.btnNext.setOnClickListener { binding.viewPager2.nextPage() }
+        binding.btnPrev.setOnClickListener { binding.viewPager2.previousPage() }
     }
 
     private fun pageChanged(pageNumber: Int) {
@@ -130,8 +130,8 @@ class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookBinding>() 
             it.isEnabled = false
             it.isClickable = false
         }
-        binding.imgPrevPage.isClickable = false
-        binding.imgNextPage.isClickable = false
+        binding.btnPrev.isClickable = false
+        binding.btnNext.isClickable = false
         binding.frmButtons.startAnimation(animFadeOut())
         //binding.frmButtons.visibility = View.GONE
         //binding.frmButtons.alpha = 0f
@@ -141,8 +141,8 @@ class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookBinding>() 
         binding.frmButtons.visibility = View.VISIBLE
         binding.frmButtons.isEnabled = true
         binding.frmButtons.isClickable = true
-        binding.imgPrevPage.isClickable = true
-        binding.imgNextPage.isClickable = true
+        binding.btnPrev.isClickable = true
+        binding.btnNext.isClickable = true
         binding.frmButtons.children.forEach {
             it.isEnabled = true
             it.isClickable = true

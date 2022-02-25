@@ -39,4 +39,6 @@
     <string name="next_page">Sonraki Sayfa</string>
     <string name="prev_page">Önceki Sayfa</string>
     <string name="exit">Çıkış</string>
+    <string name="prev_icon"><![CDATA[<]]></string>
+    <string name="next_icon"><![CDATA[>]]></string>
 </resources>
