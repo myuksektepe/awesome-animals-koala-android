@@ -36,4 +36,7 @@
     <string name="book_could_not_prepared">Kitap hazırlanamadı!</string>
     <string name="book_could_not_downloaded">Kitap indirilemedi!</string>
     <string name="book_data_could_not_fetched">Kitap detayları getirilemedi!</string>
+    <string name="next_page">Sonraki Sayfa</string>
+    <string name="prev_page">Önceki Sayfa</string>
+    <string name="exit">Çıkış</string>
 </resources>

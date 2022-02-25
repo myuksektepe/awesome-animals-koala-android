@@ -18,8 +18,8 @@
         <item name="android:windowLayoutInDisplayCutoutMode" tools:targetApi="o_mr1">
             shortEdges
         </item>
-        <item name="android:fontFamily">@font/janda</item>
-        <item name="fontFamily">@font/janda</item>
+        <item name="android:fontFamily">@font/boing</item>
+        <item name="fontFamily">@font/boing</item>
         <item name="android:letterSpacing">.0</item>
         <item name="android:textSize">21sp</item>
     </style>
