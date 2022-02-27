@@ -30,6 +30,7 @@ import awesome.animals.koala.util.ViewExtensions.animSlideInDown
 import awesome.animals.koala.util.ViewExtensions.nextPage
 import awesome.animals.koala.util.ViewExtensions.previousPage
 import awesome.animals.koala.util.ViewExtensions.showCustomDialog
+import com.bumptech.glide.Glide
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -54,6 +55,8 @@ class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookBinding>() 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        val destinationFolder = "${getDir("packages", Context.MODE_PRIVATE)}/$BOOK_NAME"
+
         when (context.resources?.configuration?.uiMode?.and(Configuration.UI_MODE_NIGHT_MASK)) {
             Configuration.UI_MODE_NIGHT_YES -> {
                 binding.imgBackground.setColorFilter(ContextCompat.getColor(context, R.color.black_70), android.graphics.PorterDuff.Mode.MULTIPLY)
@@ -70,6 +73,16 @@ class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookBinding>() 
             fragmentList.clear()
 
             bookData?.let {
+
+                // Background Image
+                val backgroundImage = "$destinationFolder/${it.backgroundImage}"
+                if (File(backgroundImage).exists()) {
+                    Glide
+                        .with(context)
+                        .load(backgroundImage)
+                        .centerCrop()
+                        .into(binding.imgBackground)
+                }
 
                 // Pages
                 for (page in it.pages) {
@@ -174,13 +187,6 @@ class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookBinding>() 
         //binding.frmButtons.alpha = 0f
     }
 
-    private var viewpagerPageChangeCallback = object : ViewPager2.OnPageChangeCallback() {
-        override fun onPageSelected(position: Int) {
-            pageChanged(position)
-            Log.i(TAG, "ViewPager ___ Position: $position")
-        }
-    }
-
     private fun closeBook() {
         showCustomDialog(
             title = getString(R.string.are_you_sure),
@@ -202,7 +208,7 @@ class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookBinding>() 
         super.onResume()
         // Song
         val destinationFolder = "${getDir("packages", Context.MODE_PRIVATE)}/$BOOK_NAME"
-        val song = "$destinationFolder/${bookData?.song}"
+        val song = "$destinationFolder/${bookData?.backgroundSong}"
         if (File(song).exists()) {
             mediaPlayer?.stop()
             mediaPlayer?.release()
@@ -230,6 +236,13 @@ class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookBinding>() 
             closeBook()
         } else {
             //binding.viewPager2.currentItem = binding.viewPager2.currentItem - 1
+        }
+    }
+
+    private var viewpagerPageChangeCallback = object : ViewPager2.OnPageChangeCallback() {
+        override fun onPageSelected(position: Int) {
+            pageChanged(position)
+            Log.i(TAG, "ViewPager ___ Position: $position")
         }
     }
 

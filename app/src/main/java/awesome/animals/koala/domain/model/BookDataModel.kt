@@ -10,7 +10,8 @@ data class BookDataModel(
     val packageFile: String,
     val packageSize: String,
     val packageItemsCount: Int,
-    val song: String?,
+    val backgroundSong: String?,
+    val backgroundImage:     String?,
     val pages: List<BookPageModel>,
 ) : Parcelable {
     override fun toString(): String = "$packageFile - $packageSize - $packageItemsCount"

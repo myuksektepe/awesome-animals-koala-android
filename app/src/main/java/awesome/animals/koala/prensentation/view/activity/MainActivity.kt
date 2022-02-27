@@ -262,7 +262,19 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
 
     private fun isBookDownloaded(): Boolean = filePackageFile!!.exists()
 
-    private fun isBookExtracted(): Boolean = (File(destinationFolder).exists() && File(destinationFolder).list().size == bookData!!.packageItemsCount)
+    private fun isBookExtracted(): Boolean {
+        val destFolder = File(destinationFolder)
+        if (destFolder.exists()) {
+            val fileList = destFolder.list()
+            fileList.forEachIndexed { index, file ->
+                Log.i(TAG, "$index - $file")
+            }
+            if (fileList.size == bookData!!.packageItemsCount) {
+                return true
+            }
+        }
+        return false
+    }
 
     private fun downloadBook() {
         downloadJob?.cancel()
