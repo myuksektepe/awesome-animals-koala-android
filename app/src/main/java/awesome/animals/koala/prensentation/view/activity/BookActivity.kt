@@ -56,7 +56,7 @@ class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookBinding>() 
 
         when (context.resources?.configuration?.uiMode?.and(Configuration.UI_MODE_NIGHT_MASK)) {
             Configuration.UI_MODE_NIGHT_YES -> {
-                binding.imgBackground.setColorFilter(ContextCompat.getColor(context, R.color.black_90), android.graphics.PorterDuff.Mode.MULTIPLY)
+                binding.imgBackground.setColorFilter(ContextCompat.getColor(context, R.color.black_70), android.graphics.PorterDuff.Mode.MULTIPLY)
             }
             Configuration.UI_MODE_NIGHT_NO -> {}
             Configuration.UI_MODE_NIGHT_UNDEFINED -> {}
