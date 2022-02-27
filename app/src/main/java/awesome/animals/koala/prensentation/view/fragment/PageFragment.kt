@@ -151,6 +151,7 @@ class PageFragment : BaseFragment<PageFragmentViewModel, FragmentPageBinding>() 
             visibility = View.GONE
         }
         binding.imageBackground.startAnimation(requireContext().animFadeIn())
+        binding.txtPageMessage.text = ""
     }
 
     companion object {

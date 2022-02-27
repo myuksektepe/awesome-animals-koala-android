@@ -125,6 +125,7 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
             when (it) {
                 is UnzipStatus.Success -> {
                     binding.txtDownloadState.text = getString(R.string.completed)
+                    deletePackageFile()
                     openBook()
                 }
                 is UnzipStatus.Error -> {
@@ -161,6 +162,46 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
         runJob?.cancel()
         runJob = lifecycleScope.launch {
             bookData?.let {
+
+                if (isBookExtracted()) {
+                    Log.i(TAG, "Book is extracted")
+                    openBook()
+                } else {
+                    Log.i(TAG, "Book is NOT extracted")
+                    if (filePackageFile != null && isBookDownloaded()) {
+                        Log.i(TAG, "Book is downloaded")
+                        extractBook()
+                    } else {
+                        Log.i(TAG, "Book is NOT downloaded")
+                        if (downloadPermissionGranted) {
+                            Log.i(TAG, "Download permission is granted")
+                            if (isNetworkAvailable()) {
+                                Log.i(TAG, "Network is available")
+                                if (readPermissionGranted) {
+                                    Log.i(TAG, "Read external storage permission is granted")
+                                    downloadBook()
+                                } else {
+                                    Log.i(TAG, "Read external storage permission is NOT granted")
+                                    updateOrRequestPermissions()
+                                }
+                            } else {
+                                Log.i(TAG, "Network is NOT available")
+                                noNetworkConnection()
+                            }
+                        } else {
+                            Log.i(TAG, "Download permission is NOT granted")
+
+                            binding.txtDownloadState.text = "${getString(R.string.download_this_book)}\n${bookData!!.packageSize}"
+                            binding.lnrDownloadThisBook.visibility = View.VISIBLE
+                            binding.btnDownloadBook.setOnClickListener {
+                                downloadPermissionGranted = true
+                                runJob()
+                            }
+                        }
+                    }
+                }
+
+                /*
                 if (filePackageFile != null && isBookDownloaded()) {
                     Log.i(TAG, "Book is downloaded")
                     if (isBookExtracted()) {
@@ -198,6 +239,8 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
                         }
                     }
                 }
+                 */
+
             } ?: run {
                 if (bookData == null) {
                     getBookData()
@@ -249,6 +292,22 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
         }
     }
 
+    private fun deletePackageFile(): Boolean {
+        try {
+            filePackageFile?.let {
+                if (it.exists()) {
+                    val deletion = it.delete()
+                    Log.i(TAG, "File ___ Book file deletion is: $deletion")
+                    return deletion
+                }
+            }
+            return false
+        } catch (e: Exception) {
+            Log.e(TAG, "File ___ Delete: ${e.message}")
+            return false
+        }
+    }
+
     private fun openBook() {
         binding.lnrDownloading.visibility = View.GONE
         binding.lnrOpenTheBook.visibility = View.VISIBLE
@@ -289,7 +348,7 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
     }
     /* -------------- */
 
-
+    /* Permission */
     private fun permissionRequest() {
         permissionsLauncher = registerForActivityResult(
             ActivityResultContracts.RequestMultiplePermissions()
@@ -359,6 +418,8 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
             tempUnit.let { it() }
         }
     }
+    /* -------------- */
+
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
