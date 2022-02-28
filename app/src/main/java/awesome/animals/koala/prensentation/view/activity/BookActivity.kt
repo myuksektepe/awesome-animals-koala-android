@@ -156,6 +156,19 @@ class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookBinding>() 
         val timeLong = (seconds * 1000).toLong()
         Log.i(TAG, "Time Long: $timeLong")
 
+        // Button Hide/Show
+        if (pageNumber == 0) {
+            binding.btnPrev.visibility = View.GONE
+        } else {
+            binding.btnPrev.visibility = View.VISIBLE
+        }
+
+        if (pageNumber == (bookData!!.pages.size - 1)) {
+            binding.btnNext.visibility = View.GONE
+        } else {
+            binding.btnNext.visibility = View.VISIBLE
+        }
+
         jobTimer?.cancel()
         jobTimer = lifecycleScope.launch {
             delay(timeLong)
@@ -164,6 +177,7 @@ class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookBinding>() 
     }
 
     private fun disableButtons() {
+        binding.frmButtons.startAnimation(animSlideOutDown())
         binding.frmButtons.isEnabled = false
         binding.frmButtons.isClickable = false
         binding.frmButtons.children.forEach {
@@ -172,7 +186,6 @@ class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookBinding>() 
         }
         binding.btnPrev.isClickable = false
         binding.btnNext.isClickable = false
-        binding.frmButtons.startAnimation(animSlideOutDown())
         //binding.frmButtons.visibility = View.GONE
         //binding.frmButtons.alpha = 0f
     }
