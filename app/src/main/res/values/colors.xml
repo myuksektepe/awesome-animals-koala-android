@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="themeColor">#6F45BA</color>
+
     <color name="transparent">#00FFFFFF</color>
     <color name="black">#FF000000</color>
     <color name="black_70">#70000000</color>
@@ -13,6 +15,4 @@
     <color name="background">#FAFAFA</color>
     <color name="background_70">#70FAFAFA</color>
     <color name="textColor">#232323</color>
-
-    <color name="themeColor">#6F45BA</color>
 </resources>

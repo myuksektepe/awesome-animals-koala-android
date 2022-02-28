@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Koala</string>
+    <string name="app_name">Koalalar</string>
 
     <string name="lipsum" translatable="false">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec quis maximus eros. Praesent finibus vel nisl volutpat interdum. Maecenas dapibus molestie consequat. Vivamus scelerisque metus ac dolor ullamcorper, in blandit tellus ullamcorper. Quisque varius lacus a mauris ullamcorper tristique. Aliquam nec odio pellentesque, pulvinar purus porttitor, congue eros. Suspendisse potenti. Nullam nec nulla et est aliquet viverra et non nisl. Etiam viverra consectetur mauris in viverra.</string>
     <string name="warning">Uyarı</string>
