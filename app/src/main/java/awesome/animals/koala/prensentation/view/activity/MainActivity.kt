@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -149,6 +150,12 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
         tempUnit = { runJob() }
         destinationFolder = "${getDir("packages", Context.MODE_PRIVATE)}/$BOOK_NAME"
         //val destination = "${Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath}/koala"
+
+        when (context.resources?.configuration?.uiMode?.and(Configuration.UI_MODE_NIGHT_MASK)) {
+            Configuration.UI_MODE_NIGHT_YES -> {
+                binding.imgBackground.setColorFilter(ContextCompat.getColor(context, R.color.black_90), android.graphics.PorterDuff.Mode.DARKEN)
+            }
+        }
 
         permissionRequest()
         runJob()

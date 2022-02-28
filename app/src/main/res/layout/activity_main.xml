@@ -11,6 +11,13 @@
         android:orientation="vertical"
         tools:context=".prensentation.view.activity.MainActivity">
 
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/page_background"
+            android:scaleType="centerCrop"
+            android:id="@+id/imgBackground" />
+
         <FrameLayout
             android:id="@+id/frmHome"
             android:layout_width="match_parent"

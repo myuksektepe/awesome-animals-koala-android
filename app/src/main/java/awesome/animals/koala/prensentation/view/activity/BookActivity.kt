@@ -25,8 +25,8 @@ import awesome.animals.koala.prensentation.view.fragment.PageFragment
 import awesome.animals.koala.prensentation.viewmodel.BookActivityViewModel
 import awesome.animals.koala.util.BOOK_NAME
 import awesome.animals.koala.util.TAG
-import awesome.animals.koala.util.ViewExtensions.animFadeOut
 import awesome.animals.koala.util.ViewExtensions.animSlideInDown
+import awesome.animals.koala.util.ViewExtensions.animSlideOutDown
 import awesome.animals.koala.util.ViewExtensions.nextPage
 import awesome.animals.koala.util.ViewExtensions.previousPage
 import awesome.animals.koala.util.ViewExtensions.showCustomDialog
@@ -59,10 +59,8 @@ class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookBinding>() 
 
         when (context.resources?.configuration?.uiMode?.and(Configuration.UI_MODE_NIGHT_MASK)) {
             Configuration.UI_MODE_NIGHT_YES -> {
-                binding.imgBackground.setColorFilter(ContextCompat.getColor(context, R.color.black_70), android.graphics.PorterDuff.Mode.MULTIPLY)
+                binding.imgBackground.setColorFilter(ContextCompat.getColor(context, R.color.black_90), android.graphics.PorterDuff.Mode.DARKEN)
             }
-            Configuration.UI_MODE_NIGHT_NO -> {}
-            Configuration.UI_MODE_NIGHT_UNDEFINED -> {}
         }
 
         bookData = intent.getParcelableExtra("book_data")
@@ -80,6 +78,12 @@ class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookBinding>() 
                     Glide
                         .with(context)
                         .load(backgroundImage)
+                        .centerCrop()
+                        .into(binding.imgBackground)
+                } else {
+                    Glide
+                        .with(context)
+                        .load(R.drawable.page_background)
                         .centerCrop()
                         .into(binding.imgBackground)
                 }
@@ -168,7 +172,7 @@ class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookBinding>() 
         }
         binding.btnPrev.isClickable = false
         binding.btnNext.isClickable = false
-        binding.frmButtons.startAnimation(animFadeOut())
+        binding.frmButtons.startAnimation(animSlideOutDown())
         //binding.frmButtons.visibility = View.GONE
         //binding.frmButtons.alpha = 0f
     }
