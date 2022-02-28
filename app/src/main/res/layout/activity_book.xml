@@ -75,7 +75,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="bottom"
-                    android:visibility="gone">
+                    android:visibility="visible">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -89,19 +89,19 @@
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:layout_gravity="center"
+                            android:layout_marginStart="10dp"
                             android:layout_weight="1">
 
                             <ImageView
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
-                                android:background="@drawable/left_button_background" />
+                                android:background="@drawable/page_button_background" />
 
                             <ImageView
                                 android:layout_width="70dp"
                                 android:layout_height="70dp"
                                 android:layout_gravity="center"
                                 android:layout_marginTop="5dp"
-                                android:layout_marginEnd="10dp"
                                 android:background="@drawable/ic_left" />
                         </FrameLayout>
 
@@ -114,18 +114,18 @@
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:layout_gravity="center"
+                            android:layout_marginEnd="10dp"
                             android:layout_weight="1">
 
                             <ImageView
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
-                                android:background="@drawable/right_button_background" />
+                                android:background="@drawable/page_button_background" />
 
                             <ImageView
                                 android:layout_width="70dp"
                                 android:layout_height="70dp"
                                 android:layout_gravity="center"
-                                android:layout_marginStart="10dp"
                                 android:layout_marginTop="5dp"
                                 android:background="@drawable/ic_right" />
                         </FrameLayout>

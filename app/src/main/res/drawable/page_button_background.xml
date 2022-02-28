@@ -5,5 +5,7 @@
         android:width="70dp"
         android:height="70dp" />
     <solid android:color="@color/nextButton" />
-    <corners android:topLeftRadius="70dp" />
+    <corners
+        android:topRightRadius="70dp"
+        android:topLeftRadius="70dp" />
 </shape>
