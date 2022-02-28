@@ -15,10 +15,28 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <ImageView
-            android:id="@+id/imgBackground"
+        <!-- Background -->
+        <FrameLayout
+            android:id="@+id/frmBackground"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/imgBackground"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:src="@drawable/page_background" />
+
+            <ImageView
+                android:id="@+id/imgCircle"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingStart="-32dp"
+                android:paddingEnd="-32dp"
+                android:src="@drawable/circle" />
+
+        </FrameLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -90,6 +108,7 @@
                             android:layout_height="match_parent"
                             android:layout_gravity="center"
                             android:layout_marginStart="10dp"
+                            android:layout_marginEnd="10dp"
                             android:layout_weight="1">
 
                             <ImageView
@@ -105,15 +124,12 @@
                                 android:background="@drawable/ic_left" />
                         </FrameLayout>
 
-                        <View
-                            android:layout_width="20dp"
-                            android:layout_height="0dp" />
-
                         <FrameLayout
                             android:id="@+id/btnNext"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:layout_gravity="center"
+                            android:layout_marginStart="10dp"
                             android:layout_marginEnd="10dp"
                             android:layout_weight="1">
 

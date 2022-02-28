@@ -32,7 +32,7 @@
             android:letterSpacing=".1"
             android:text="@string/lipsum"
             android:textAlignment="center"
-            android:textColor="@color/text_color"
+            android:textColor="@color/textColor"
             android:textSize="17sp" />
 
         <LinearLayout

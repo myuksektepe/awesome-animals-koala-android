@@ -7,5 +7,5 @@
     <color name="secondaryVariant">#FFD558</color>
     <color name="background">#292929</color>
     <color name="background_70">#70292929</color>
-    <color name="text_color">#FAFAFA</color>
+    <color name="textColor">#FAFAFA</color>
 </resources>

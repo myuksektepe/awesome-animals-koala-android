@@ -30,6 +30,7 @@ import awesome.animals.koala.util.ViewExtensions.animSlideOutDown
 import awesome.animals.koala.util.ViewExtensions.nextPage
 import awesome.animals.koala.util.ViewExtensions.previousPage
 import awesome.animals.koala.util.ViewExtensions.showCustomDialog
+import awesome.animals.koala.util.animations.ZoomOutPageTransformer
 import com.bumptech.glide.Glide
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
@@ -60,6 +61,7 @@ class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookBinding>() 
         when (context.resources?.configuration?.uiMode?.and(Configuration.UI_MODE_NIGHT_MASK)) {
             Configuration.UI_MODE_NIGHT_YES -> {
                 binding.imgBackground.setColorFilter(ContextCompat.getColor(context, R.color.black_90), android.graphics.PorterDuff.Mode.DARKEN)
+                binding.imgCircle.setColorFilter(ContextCompat.getColor(context, R.color.black_90), android.graphics.PorterDuff.Mode.DARKEN)
             }
         }
 
@@ -113,7 +115,7 @@ class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookBinding>() 
                     offscreenPageLimit = 1
                     isUserInputEnabled = false
                     adapter = pageAdapter
-                    //setPageTransformer(ZoomOutPageTransformer())
+                    setPageTransformer(ZoomOutPageTransformer())
                     /*
                     setPageTransformer { page, position ->
                         setParallaxTransformation(page, position)

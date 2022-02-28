@@ -64,12 +64,17 @@
                 android:autoSizeMinTextSize="23sp"
                 android:autoSizeStepGranularity="3sp"
                 android:autoSizeTextType="uniform"
+                android:shadowColor="@color/black_70"
+                android:shadowRadius="16"
+                android:shadowDx="0"
+                android:shadowDy="4"
                 android:gravity="center"
                 android:letterSpacing=".05"
                 android:maxHeight="123dp"
                 android:scrollbars="vertical"
                 android:text="@string/lipsum"
                 android:textAlignment="center"
+                android:textColor="@color/white"
                 android:textSize="23sp" />
 
             <View

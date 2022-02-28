@@ -12,7 +12,7 @@
     <color name="secondaryVariant">#FFD558</color>
     <color name="background">#FAFAFA</color>
     <color name="background_70">#70FAFAFA</color>
-    <color name="text_color">#232323</color>
+    <color name="textColor">#232323</color>
 
-    <color name="nextButton">#6F45BA</color>
+    <color name="themeColor">#6F45BA</color>
 </resources>

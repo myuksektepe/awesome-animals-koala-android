@@ -161,7 +161,6 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
         runJob()
     }
 
-
     private fun runJob() {
         hideDialog()
         hideLoading()
