@@ -19,7 +19,6 @@ import awesome.animals.koala.util.BOOK_NAME
 import awesome.animals.koala.util.TAG
 import awesome.animals.koala.util.ViewExtensions.animFadeIn
 import awesome.animals.koala.util.ViewExtensions.animFadeOut
-import awesome.animals.koala.util.ViewExtensions.animSlideInDown
 import awesome.animals.koala.util.ViewExtensions.animSlideInUp
 import com.bumptech.glide.Glide
 import dagger.hilt.android.AndroidEntryPoint
@@ -33,7 +32,7 @@ private const val PAGE_MODEL = "page_model"
 class PageFragment : BaseFragment<PageFragmentViewModel, FragmentPageBinding>() {
     private lateinit var pageModel: BookPageModel
     private lateinit var video: String
-    private lateinit var video_cover: String
+    private lateinit var videoCover: String
     private lateinit var voice: String
     private var mediaPlayer: MediaPlayer? = null
     override val layoutRes: Int = R.layout.fragment_page
@@ -52,17 +51,17 @@ class PageFragment : BaseFragment<PageFragmentViewModel, FragmentPageBinding>() 
 
         val destinationFolder = "${requireActivity().getDir("packages", Context.MODE_PRIVATE)}/$BOOK_NAME"
         video = "$destinationFolder/${pageModel.video}"
-        video_cover = "$destinationFolder/${pageModel.video_cover}"
+        videoCover = "$destinationFolder/${pageModel.videoCover}"
         voice = "$destinationFolder/${pageModel.voice}"
 
         // Message
         binding.txtPageMessage.text = ""
 
         // Video Cover Image
-        if (File(video_cover).exists()) {
+        if (File(videoCover).exists()) {
             Glide
                 .with(requireContext())
-                .load(video_cover)
+                .load(videoCover)
                 .centerCrop()
                 .into(binding.imageBackground)
         }

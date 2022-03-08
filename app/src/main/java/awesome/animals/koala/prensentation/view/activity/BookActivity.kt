@@ -92,15 +92,15 @@ class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookBinding>() 
 
                 // Pages
                 for (page in it.pages) {
-                    if (page.is_active) {
+                    if (page.isActive) {
                         val pageModel = BookPageModel(
                             title = page.title,
                             message = page.message,
                             video = page.video,
-                            video_cover = page.video_cover,
+                            videoCover = page.videoCover,
                             voice = page.voice,
                             timeSeconds = page.timeSeconds,
-                            is_active = page.is_active
+                            isActive = page.isActive
                         )
                         fragmentList.add(PageFragment.newInstance(pageModel))
                     }
@@ -234,7 +234,7 @@ class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookBinding>() 
             mediaPlayer = null
             mediaPlayer = MediaPlayer().apply {
                 isLooping = true
-                setVolume(.2f, .2f)
+                setVolume(.1f, .1f)
                 setAudioAttributes(
                     AudioAttributes.Builder()
                         .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)

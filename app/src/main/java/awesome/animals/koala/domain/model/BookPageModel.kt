@@ -10,8 +10,8 @@ data class BookPageModel(
     val title: String?,
     val message: String,
     val video: String?,
-    val video_cover: String?,
+    val videoCover: String?,
     val voice: String?,
     val timeSeconds: Int,
-    val is_active: Boolean,
+    val isActive: Boolean,
 ) : Parcelable
