@@ -38,6 +38,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.File
 
+
 @AndroidEntryPoint
 class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookBinding>() {
     override val layoutRes: Int = R.layout.activity_book
@@ -227,25 +228,35 @@ class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookBinding>() 
         super.onResume()
         // Song
         val destinationFolder = "${getDir("packages", Context.MODE_PRIVATE)}/$BOOK_NAME"
-        val song = "$destinationFolder/${bookData?.backgroundSong}"
-        if (File(song).exists()) {
-            mediaPlayer?.stop()
-            mediaPlayer?.release()
-            mediaPlayer = null
-            mediaPlayer = MediaPlayer().apply {
-                isLooping = true
-                setVolume(.1f, .1f)
-                setAudioAttributes(
-                    AudioAttributes.Builder()
-                        .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                        .setUsage(AudioAttributes.USAGE_MEDIA)
-                        .build()
-                )
-                setDataSource(context, Uri.parse(song))
-                prepare()
-                start()
-                setOnErrorListener { _, _, _ -> true }
-            }
+        val songPath = "$destinationFolder/${bookData?.backgroundSong}"
+
+        mediaPlayer?.stop()
+        mediaPlayer?.release()
+        mediaPlayer = null
+        mediaPlayer = MediaPlayer().apply {
+            isLooping = true
+            setVolume(.1f, .1f)
+            setAudioAttributes(
+                AudioAttributes.Builder()
+                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                    .setUsage(AudioAttributes.USAGE_MEDIA)
+                    .build()
+            )
+            //setDataSource(context, Uri.parse(song))
+        }
+
+        if (!bookData?.backgroundSong.isNullOrBlank() && File(songPath).exists()) {
+            mediaPlayer?.setDataSource(context, Uri.parse(songPath))
+        } else {
+            val descriptor = assets.openFd("song.mp3")
+            mediaPlayer?.setDataSource(descriptor.fileDescriptor, descriptor.startOffset, descriptor.length)
+            descriptor.close()
+        }
+
+        mediaPlayer?.apply {
+            prepare()
+            start()
+            setOnErrorListener { _, _, _ -> true }
         }
     }
 
