@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:animateLayoutChanges="true">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".prensentation.view.fragment.PageFragment">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <VideoView
+                android:id="@+id/videoBackground"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentBottom="true"
+                android:visibility="invisible" />
+
+        </RelativeLayout>
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/imageBackground"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop" />
+
+        <TextView
+            android:id="@+id/txtPageMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center|bottom"
+            android:autoSizeMaxTextSize="50sp"
+            android:autoSizeMinTextSize="23sp"
+            android:autoSizeStepGranularity="3sp"
+            android:autoSizeTextType="uniform"
+            android:background="@drawable/gradient_bottom_to_top"
+            android:gravity="center"
+            android:letterSpacing=".05"
+            android:paddingLeft="36dp"
+            android:paddingTop="108dp"
+            android:paddingRight="36dp"
+            android:paddingBottom="80dp"
+            android:scrollbars="vertical"
+            android:shadowColor="@color/black_70"
+            android:shadowDx="0"
+            android:shadowDy="4"
+            android:shadowRadius="16"
+            android:text="@string/lipsum"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:textSize="23sp" />
+    </FrameLayout>
+
+</layout>

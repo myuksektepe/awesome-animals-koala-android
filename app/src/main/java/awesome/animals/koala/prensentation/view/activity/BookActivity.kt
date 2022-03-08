@@ -16,7 +16,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
 import awesome.animals.koala.R
-import awesome.animals.koala.databinding.ActivityBookBinding
+import awesome.animals.koala.databinding.ActivityBookAltBinding
 import awesome.animals.koala.domain.model.BookDataModel
 import awesome.animals.koala.domain.model.BookPageModel
 import awesome.animals.koala.prensentation.adapter.ViewPager2Adapter
@@ -30,7 +30,6 @@ import awesome.animals.koala.util.ViewExtensions.animSlideOutDown
 import awesome.animals.koala.util.ViewExtensions.nextPage
 import awesome.animals.koala.util.ViewExtensions.previousPage
 import awesome.animals.koala.util.ViewExtensions.showCustomDialog
-import awesome.animals.koala.util.animations.ZoomOutPageTransformer
 import com.bumptech.glide.Glide
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
@@ -40,8 +39,8 @@ import java.io.File
 
 
 @AndroidEntryPoint
-class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookBinding>() {
-    override val layoutRes: Int = R.layout.activity_book
+class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookAltBinding>() {
+    override val layoutRes: Int = R.layout.activity_book_alt
     override val viewModel: BookActivityViewModel by viewModels()
     override var viewLifeCycleOwner: LifecycleOwner = this
     override fun obverseViewModel() {}
@@ -116,7 +115,7 @@ class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookBinding>() 
                     offscreenPageLimit = 1
                     isUserInputEnabled = false
                     adapter = pageAdapter
-                    setPageTransformer(ZoomOutPageTransformer())
+                    //setPageTransformer(ZoomOutPageTransformer())
                     /*
                     setPageTransformer { page, position ->
                         setParallaxTransformation(page, position)

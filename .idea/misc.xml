@@ -12,6 +12,8 @@
         <entry key="app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.182" />
         <entry key="app/src/main/res/drawable/circle.xml" value="0.1825" />
         <entry key="app/src/main/res/drawable/custom_dialog_background.xml" value="0.1745" />
+        <entry key="app/src/main/res/drawable/gradient.xml" value="0.1825" />
+        <entry key="app/src/main/res/drawable/gradient_top_to_bottom.xml" value="0.1825" />
         <entry key="app/src/main/res/drawable/ic_close.xml" value="0.1825" />
         <entry key="app/src/main/res/drawable/ic_launcher_background.xml" value="0.182" />
         <entry key="app/src/main/res/drawable/ic_left.xml" value="0.1825" />
@@ -22,10 +24,12 @@
         <entry key="app/src/main/res/drawable/quarter_circle.xml" value="0.1825" />
         <entry key="app/src/main/res/drawable/right_button_background.xml" value="0.1825" />
         <entry key="app/src/main/res/layout/activity_book.xml" value="0.25" />
+        <entry key="app/src/main/res/layout/activity_book_alt.xml" value="0.27239583333333334" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.23177083333333334" />
         <entry key="app/src/main/res/layout/custom_dialog.xml" value="0.23177083333333334" />
         <entry key="app/src/main/res/layout/dialog_loading.xml" value="0.23177083333333334" />
         <entry key="app/src/main/res/layout/fragment_page.xml" value="0.24010416666666667" />
+        <entry key="app/src/main/res/layout/fragment_page_alt.xml" value="0.27239583333333334" />
       </map>
     </option>
   </component>
