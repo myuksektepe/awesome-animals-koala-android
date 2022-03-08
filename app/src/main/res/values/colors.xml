@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="themeColor">#6F45BA</color>
+    <color name="themeColor90">#ED6F45BA</color>
 
     <color name="transparent">#00FFFFFF</color>
     <color name="black">#FF000000</color>

@@ -32,8 +32,10 @@
                 android:id="@+id/imgCircle"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:paddingTop="90dp"
                 android:paddingStart="-32dp"
                 android:paddingEnd="-32dp"
+                android:visibility="gone"
                 android:src="@drawable/circle" />
 
         </FrameLayout>

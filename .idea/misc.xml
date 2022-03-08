@@ -17,6 +17,7 @@
         <entry key="app/src/main/res/drawable/ic_left.xml" value="0.1825" />
         <entry key="app/src/main/res/drawable/ic_right.xml" value="0.1825" />
         <entry key="app/src/main/res/drawable/left_button_background.xml" value="0.1825" />
+        <entry key="app/src/main/res/drawable/page_message_background.xml" value="0.1825" />
         <entry key="app/src/main/res/drawable/quarter_circle.xml" value="0.1825" />
         <entry key="app/src/main/res/drawable/right_button_background.xml" value="0.1825" />
         <entry key="app/src/main/res/layout/activity_book.xml" value="0.25" />

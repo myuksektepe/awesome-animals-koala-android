@@ -56,6 +56,7 @@ class PageFragment : BaseFragment<PageFragmentViewModel, FragmentPageBinding>() 
 
         // Message
         binding.txtPageMessage.text = ""
+        binding.txtPageMessage.visibility = View.INVISIBLE
 
         // Video Cover Image
         if (File(videoCover).exists()) {
@@ -110,7 +111,6 @@ class PageFragment : BaseFragment<PageFragmentViewModel, FragmentPageBinding>() 
             }
         }
 
-
         // Voice
         if (File(voice).exists()) {
             mediaPlayer?.stop()
@@ -135,6 +135,7 @@ class PageFragment : BaseFragment<PageFragmentViewModel, FragmentPageBinding>() 
             }
         }
 
+        // Message
         binding.txtPageMessage.run {
             visibility = View.VISIBLE
             this.text = pageModel.message
@@ -152,6 +153,7 @@ class PageFragment : BaseFragment<PageFragmentViewModel, FragmentPageBinding>() 
         }
         binding.imageBackground.startAnimation(requireContext().animFadeIn())
         binding.txtPageMessage.text = ""
+        binding.txtPageMessage.visibility = View.INVISIBLE
     }
 
     companion object {
