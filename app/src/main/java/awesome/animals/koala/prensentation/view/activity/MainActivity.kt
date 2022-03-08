@@ -272,11 +272,17 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
         val destFolder = File(destinationFolder)
         if (destFolder.exists()) {
             val fileList = destFolder.list()
-            fileList.forEachIndexed { index, file ->
-                Log.i(TAG, "$index - $file")
-            }
             if (fileList.size == bookData!!.packageItemsCount) {
                 return true
+            } else {
+                fileList.forEachIndexed { index, file ->
+                    File(file).let {
+                        if (it.exists()) {
+                            val deletion = it.delete()
+                            Log.w(TAG, "$index - $file - Deletion is $deletion")
+                        }
+                    }
+                }
             }
         }
         return false

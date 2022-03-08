@@ -78,6 +78,7 @@ class PageFragment : BaseFragment<PageFragmentViewModel, FragmentPageBinding>() 
                 setVideoPath(video)
                 setOnPreparedListener {
                     it.isLooping = true
+                    it.setVolume(0f, 0f)
 
                     val videoRatio = it.videoWidth / it.videoHeight.toFloat()
                     val screenRatio = this.width / this.height.toFloat()
