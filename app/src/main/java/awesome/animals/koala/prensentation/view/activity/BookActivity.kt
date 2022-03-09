@@ -16,7 +16,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
 import awesome.animals.koala.R
-import awesome.animals.koala.databinding.ActivityBookAltBinding
+import awesome.animals.koala.databinding.ActivityBookBinding
 import awesome.animals.koala.domain.model.BookDataModel
 import awesome.animals.koala.domain.model.BookPageModel
 import awesome.animals.koala.prensentation.adapter.ViewPager2Adapter
@@ -25,8 +25,6 @@ import awesome.animals.koala.prensentation.view.fragment.PageFragment
 import awesome.animals.koala.prensentation.viewmodel.BookActivityViewModel
 import awesome.animals.koala.util.BOOK_NAME
 import awesome.animals.koala.util.TAG
-import awesome.animals.koala.util.ViewExtensions.animSlideInDown
-import awesome.animals.koala.util.ViewExtensions.animSlideOutDown
 import awesome.animals.koala.util.ViewExtensions.nextPage
 import awesome.animals.koala.util.ViewExtensions.previousPage
 import awesome.animals.koala.util.ViewExtensions.showCustomDialog
@@ -34,13 +32,12 @@ import com.bumptech.glide.Glide
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import java.io.File
 
 
 @AndroidEntryPoint
-class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookAltBinding>() {
-    override val layoutRes: Int = R.layout.activity_book_alt
+class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookBinding>() {
+    override val layoutRes: Int = R.layout.activity_book
     override val viewModel: BookActivityViewModel by viewModels()
     override var viewLifeCycleOwner: LifecycleOwner = this
     override fun obverseViewModel() {}

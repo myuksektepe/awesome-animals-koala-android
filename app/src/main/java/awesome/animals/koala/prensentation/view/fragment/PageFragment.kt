@@ -11,33 +11,28 @@ import android.view.View
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import awesome.animals.koala.R
-import awesome.animals.koala.databinding.FragmentPageAltBinding
+import awesome.animals.koala.databinding.FragmentPageBinding
 import awesome.animals.koala.domain.model.BookPageModel
 import awesome.animals.koala.prensentation.base.BaseFragment
 import awesome.animals.koala.prensentation.viewmodel.PageFragmentViewModel
 import awesome.animals.koala.util.BOOK_NAME
 import awesome.animals.koala.util.TAG
-import awesome.animals.koala.util.ViewExtensions.animFadeIn
-import awesome.animals.koala.util.ViewExtensions.animFadeOut
-import awesome.animals.koala.util.ViewExtensions.animSlideInDown
-import awesome.animals.koala.util.ViewExtensions.animSlideInUp
 import com.bumptech.glide.Glide
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import java.io.File
 
 private const val PAGE_MODEL = "page_model"
 
 @AndroidEntryPoint
-class PageFragment : BaseFragment<PageFragmentViewModel, FragmentPageAltBinding>() {
+class PageFragment : BaseFragment<PageFragmentViewModel, FragmentPageBinding>() {
     private lateinit var pageModel: BookPageModel
     private lateinit var video: String
     private lateinit var videoCover: String
     private lateinit var voice: String
-    private val alt = true
+    private val alt = false
     private var mediaPlayer: MediaPlayer? = null
-    override val layoutRes: Int = R.layout.fragment_page_alt
+    override val layoutRes: Int = R.layout.fragment_page
     override val viewModel: PageFragmentViewModel by viewModels()
     override fun observeViewModel() {}
 
