@@ -17,11 +17,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Koala">
         <activity
-            android:name=".prensentation.view.activity.BookActivity"
-            android:exported="false" />
-        <activity
-            android:name=".prensentation.view.activity.MainActivity"
-            android:configChanges="orientation"
+            android:name=".prensentation.view.activity.SplashActivity"
             android:exported="true"
             android:screenOrientation="portrait">
             <intent-filter>
@@ -30,6 +26,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".prensentation.view.activity.BookActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".prensentation.view.activity.MainActivity"
+            android:configChanges="orientation"
+            android:exported="true"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>
