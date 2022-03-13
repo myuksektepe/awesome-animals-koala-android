@@ -17,9 +17,14 @@ import awesome.animals.koala.prensentation.base.BaseFragment
 import awesome.animals.koala.prensentation.viewmodel.PageFragmentViewModel
 import awesome.animals.koala.util.BOOK_NAME
 import awesome.animals.koala.util.TAG
+import awesome.animals.koala.util.ViewExtensions.animFadeIn
+import awesome.animals.koala.util.ViewExtensions.animFadeOut
+import awesome.animals.koala.util.ViewExtensions.animSlideInDown
+import awesome.animals.koala.util.ViewExtensions.animSlideInUp
 import com.bumptech.glide.Glide
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.io.File
 
 private const val PAGE_MODEL = "page_model"

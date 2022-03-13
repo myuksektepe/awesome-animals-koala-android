@@ -25,6 +25,8 @@ import awesome.animals.koala.prensentation.view.fragment.PageFragment
 import awesome.animals.koala.prensentation.viewmodel.BookActivityViewModel
 import awesome.animals.koala.util.BOOK_NAME
 import awesome.animals.koala.util.TAG
+import awesome.animals.koala.util.ViewExtensions.animSlideInDown
+import awesome.animals.koala.util.ViewExtensions.animSlideOutDown
 import awesome.animals.koala.util.ViewExtensions.nextPage
 import awesome.animals.koala.util.ViewExtensions.previousPage
 import awesome.animals.koala.util.ViewExtensions.showCustomDialog
@@ -32,6 +34,7 @@ import com.bumptech.glide.Glide
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.io.File
 
 
