@@ -98,8 +98,8 @@ class PageFragment : BaseFragment<PageFragmentViewModel, FragmentPageBinding>() 
                     binding.videoBackground.visibility = View.VISIBLE
                 }
                 setOnErrorListener { mp, what, extra ->
-                    Log.e(TAG, "setOnErrorListener what: $what")
-                    Log.e(TAG, "setOnErrorListener extra: $extra")
+                    Log.e(TAG, "Video setOnErrorListener what: $what")
+                    Log.e(TAG, "Video setOnErrorListener extra: $extra")
                     binding.videoBackground.visibility = View.GONE
                     true
                 }
@@ -115,6 +115,11 @@ class PageFragment : BaseFragment<PageFragmentViewModel, FragmentPageBinding>() 
 
         // Voice
         if (File(voice).exists()) {
+
+            Log.i(TAG, "Voice: $voice")
+            Log.i(TAG, "File Voice: ${File(voice)}")
+            Log.i(TAG, "Uri Parse Voice: ${Uri.parse(voice)}")
+
             mediaPlayer?.stop()
             mediaPlayer?.release()
             mediaPlayer = null
@@ -127,13 +132,24 @@ class PageFragment : BaseFragment<PageFragmentViewModel, FragmentPageBinding>() 
                         .build()
                 )
                 setDataSource(requireContext(), Uri.parse(voice))
-                prepare()
-                //start()
-                setOnErrorListener { mp, what, extra -> true }
-            }
-            lifecycleScope.launch {
-                delay(1000)
-                mediaPlayer!!.start()
+                //prepare()
+                prepareAsync()
+                setOnPreparedListener {
+                    lifecycleScope.launch {
+                        delay(1000)
+                        it.start()
+                    }
+                }
+                setOnErrorListener { mp, what, extra ->
+                    Log.e(TAG, "Voice setOnErrorListener what: $what")
+                    Log.e(TAG, "Voice setOnErrorListener extra: $extra")
+                    true
+                }
+                setOnInfoListener { mp, what, extra ->
+                    Log.e(TAG, "Voice setOnInfoListener what: $what")
+                    Log.e(TAG, "Voice setOnInfoListener extra: $extra")
+                    true
+                }
             }
         }
 

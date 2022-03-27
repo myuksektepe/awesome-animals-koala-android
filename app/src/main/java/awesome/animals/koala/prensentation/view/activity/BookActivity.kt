@@ -253,8 +253,12 @@ class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookBinding>() 
         }
 
         mediaPlayer?.apply {
-            prepare()
-            start()
+            prepareAsync()
+            setOnPreparedListener {
+                it.start()
+            }
+            //prepare()
+            //start()
             setOnErrorListener { _, _, _ -> true }
         }
     }

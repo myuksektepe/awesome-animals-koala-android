@@ -31,7 +31,7 @@ class SplashActivity : BaseActivity<SplashActivityViewModel, ActivitySplashBindi
             setVideoURI(Uri.parse(intro))
             setOnPreparedListener {
                 it.isLooping = false
-                it.setVolume(1f, 1f)
+                it.setVolume(.2f, .2f)
 
                 val videoRatio = it.videoWidth / it.videoHeight.toFloat()
                 val screenRatio = this.width / this.height.toFloat()
@@ -46,6 +46,7 @@ class SplashActivity : BaseActivity<SplashActivityViewModel, ActivitySplashBindi
             }
             setOnCompletionListener {
                 startActivity(Intent(this@SplashActivity, MainActivity::class.java))
+                finish()
             }
             setOnErrorListener { mp, what, extra ->
                 Log.e(TAG, "setOnErrorListener what: $what")

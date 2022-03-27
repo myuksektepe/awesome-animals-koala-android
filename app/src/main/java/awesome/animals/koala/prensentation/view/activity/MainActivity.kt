@@ -206,47 +206,6 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
                         }
                     }
                 }
-
-                /*
-                if (filePackageFile != null && isBookDownloaded()) {
-                    Log.i(TAG, "Book is downloaded")
-                    if (isBookExtracted()) {
-                        Log.i(TAG, "Book is extracted")
-                        openBook()
-                    } else {
-                        Log.i(TAG, "Book is NOT extracted")
-                        extractBook()
-                    }
-                } else {
-                    Log.i(TAG, "Book is NOT downloaded")
-                    if (downloadPermissionGranted) {
-                        Log.i(TAG, "Download permission is granted")
-                        if (isNetworkAvailable()) {
-                            Log.i(TAG, "Network is available")
-                            if (readPermissionGranted) {
-                                Log.i(TAG, "Read external storage permission is granted")
-                                downloadBook()
-                            } else {
-                                Log.i(TAG, "Read external storage permission is NOT granted")
-                                updateOrRequestPermissions()
-                            }
-                        } else {
-                            Log.i(TAG, "Network is NOT available")
-                            noNetworkConnection()
-                        }
-                    } else {
-                        Log.i(TAG, "Download permission is NOT granted")
-
-                        binding.txtDownloadState.text = "${getString(R.string.download_this_book)}\n${bookData!!.packageSize}"
-                        binding.lnrDownloadThisBook.visibility = View.VISIBLE
-                        binding.btnDownloadBook.setOnClickListener {
-                            downloadPermissionGranted = true
-                            runJob()
-                        }
-                    }
-                }
-                 */
-
             } ?: run {
                 if (bookData == null) {
                     getBookData()
