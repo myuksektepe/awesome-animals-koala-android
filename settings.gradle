@@ -5,5 +5,5 @@ pluginManagement {
         mavenCentral()
     }
 }
-rootProject.name = "Koala"
+rootProject.name = "Awesome Animals"
 include ':app'

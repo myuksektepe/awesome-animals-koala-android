@@ -12,7 +12,7 @@ android {
     compileSdk 31
 
     defaultConfig {
-        applicationId "awesome.animals.koala"
+        applicationId "obidahi.books.animals"
         minSdk 21
         targetSdk 31
         versionCode 1

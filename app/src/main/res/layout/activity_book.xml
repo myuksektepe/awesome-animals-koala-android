@@ -8,7 +8,7 @@
 
         <variable
             name="view"
-            type="awesome.animals.koala.prensentation.view.activity.BookActivity" />
+            type="obidahi.books.animals.prensentation.view.activity.BookActivity" />
     </data>
 
     <FrameLayout
