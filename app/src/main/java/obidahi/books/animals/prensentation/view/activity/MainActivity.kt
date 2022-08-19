@@ -103,6 +103,7 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
         // Download Status
         viewModel.downloadState.observe(viewLifeCycleOwner) {
             when (it) {
+                is DownloadStatus.Started -> {}
                 is DownloadStatus.Success -> {
                     binding.txtDownloadState.text = getString(R.string.completed)
                     runJob()
@@ -297,7 +298,7 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
         binding.txtDownloadState.text = getString(R.string.open_this_book)
         binding.btnOpenBook.setOnClickListener {
             val intent = Intent(context, BookActivity::class.java)
-            intent.putExtra("book_data", bookData)
+            intent.putExtra("BOOK_DATA", bookData)
             startActivity(intent)
         }
     }

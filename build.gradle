@@ -1,16 +1,15 @@
 buildscript {
-    ext.kotlin_version = '1.6.10'
+    ext.kotlin_version = '1.7.0'
     repositories {
         google()
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.1.2'
-
+        classpath 'com.android.tools.build:gradle:7.2.2'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath "org.jetbrains.kotlin:kotlin-serialization:1.6.10"
+        classpath "org.jetbrains.kotlin:kotlin-serialization:1.7.10"
 
-        def hilt_version = "2.38.1"
+        def hilt_version = '2.43.2'
         classpath "com.google.dagger:hilt-android-gradle-plugin:$hilt_version"
     }
 }
@@ -19,7 +18,8 @@ plugins {
     id 'com.android.application' version '7.1.1' apply false
     id 'com.android.library' version '7.1.1' apply false
     id 'org.jetbrains.kotlin.android' version '1.6.10' apply false
-    //id 'dagger.hilt.android.plugin' version '2.38.1' apply false
+    //id 'com.google.dagger.hilt.android' version '2.42' apply false
+    //id 'dagger.hilt.android.plugin' version '2.42' apply false
 }
 
 allprojects {
@@ -28,7 +28,6 @@ allprojects {
         mavenCentral()
     }
 }
-
 
 
 task clean(type: Delete) {

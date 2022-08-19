@@ -18,7 +18,7 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
-            android:layout_marginBottom="250dp"
+            android:layout_marginBottom="210dp"
             android:foregroundGravity="center"
             app:cardCornerRadius="32dp"
             app:cardElevation="16dp"
@@ -59,7 +59,6 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginTop="-32dp"
-            android:layout_marginBottom="80dp"
             android:autoSizeMaxTextSize="50sp"
             android:autoSizeMinTextSize="23sp"
             android:autoSizeStepGranularity="3sp"
@@ -77,11 +76,11 @@
             android:shadowRadius="16"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="@+id/crdPager"
+            app:layout_constraintHeight_max="160dp"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="@+id/crdPager"
             app:layout_constraintTop_toBottomOf="@+id/crdPager"
-            app:layout_constraintVertical_bias="0.0"
-            tools:targetApi="o">
+            app:layout_constraintVertical_bias="0.0">
 
             <TextView
                 android:id="@+id/txtPageMessage"
@@ -90,12 +89,10 @@
                 android:layout_gravity="center|top"
                 android:gravity="center"
                 android:letterSpacing=".05"
-
                 android:text="@string/lipsum"
                 android:textAlignment="center"
                 android:textColor="@color/white"
                 android:textSize="20sp" />
-
         </ScrollView>
 
 

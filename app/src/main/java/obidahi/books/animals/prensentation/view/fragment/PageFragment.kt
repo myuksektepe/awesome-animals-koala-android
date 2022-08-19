@@ -4,6 +4,7 @@ import android.content.Context
 import android.media.AudioAttributes
 import android.media.MediaPlayer
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Parcelable
 import android.util.Log
@@ -27,7 +28,7 @@ import obidahi.books.animals.util.ViewExtensions.animSlideInDown
 import obidahi.books.animals.util.ViewExtensions.animSlideInUp
 import java.io.File
 
-private const val PAGE_MODEL = "page_model"
+private const val PAGE_MODEL = "PAGE_MODEL"
 
 @AndroidEntryPoint
 class PageFragment : BaseFragment<PageFragmentViewModel, FragmentPageBinding>() {
@@ -44,7 +45,11 @@ class PageFragment : BaseFragment<PageFragmentViewModel, FragmentPageBinding>() 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            pageModel = it.getParcelable("page_model")!!
+            pageModel = if (Build.VERSION.SDK_INT >= 33) {
+                it.getParcelable(PAGE_MODEL, BookPageModel::class.java)!!
+            } else {
+                it.getParcelable(PAGE_MODEL)!!
+            }
         }
     }
 

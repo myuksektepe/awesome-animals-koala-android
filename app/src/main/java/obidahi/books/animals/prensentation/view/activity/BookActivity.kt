@@ -5,6 +5,7 @@ import android.content.res.Configuration
 import android.media.AudioAttributes
 import android.media.MediaPlayer
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -65,7 +66,11 @@ class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookBinding>() 
             }
         }
 
-        bookData = intent.getParcelableExtra("book_data")
+        bookData = if (Build.VERSION.SDK_INT >= 33) {
+            intent.getParcelableExtra("BOOK_DATA", BookDataModel::class.java)
+        } else {
+            intent.getParcelableExtra<BookDataModel>("BOOK_DATA")
+        }
 
         lifecycleScope.launchWhenCreated {
 
@@ -97,7 +102,9 @@ class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookBinding>() 
                             title = page.title,
                             message = page.message,
                             video = page.video,
+                            videoOwner = page.videoOwner,
                             image = page.image,
+                            imageOwner = page.imageOwner,
                             voice = page.voice,
                             time = page.time,
                             isActive = page.isActive
@@ -229,6 +236,7 @@ class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookBinding>() 
         val destinationFolder = "${getDir("packages", Context.MODE_PRIVATE)}/$BOOK_NAME"
         val songPath = "$destinationFolder/${bookData?.backgroundSong}"
 
+        binding.btnMute.setBackgroundResource(R.drawable.ic_music_on)
         mediaPlayer?.stop()
         mediaPlayer?.release()
         mediaPlayer = null
@@ -263,6 +271,7 @@ class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookBinding>() 
         }
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
         if (binding.viewPager2.currentItem == 0) {
             //super.onBackPressed()

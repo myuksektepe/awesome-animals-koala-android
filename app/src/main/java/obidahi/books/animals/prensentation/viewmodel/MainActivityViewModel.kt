@@ -2,7 +2,6 @@ package obidahi.books.animals.prensentation.viewmodel
 
 import androidx.lifecycle.MutableLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.collect
 import obidahi.books.animals.data.repository.RemoteRepository
 import obidahi.books.animals.domain.model.BookDataModel
 import obidahi.books.animals.domain.model.DownloadStatus
