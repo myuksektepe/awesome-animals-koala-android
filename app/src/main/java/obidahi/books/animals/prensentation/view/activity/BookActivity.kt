@@ -160,7 +160,7 @@ class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookAltBinding>
         Log.i(TAG, "Page Changed: $pageNumber")
 
         // Change page number
-        binding.txtPageNumber.text = "${pageNumber + 1} / ${bookData!!.pages.size + 1}"
+        binding.txtPageNumber.text = "${pageNumber + 1} / ${bookData!!.pages.size}"
 
         // Disable Buttons
         disableButtons()

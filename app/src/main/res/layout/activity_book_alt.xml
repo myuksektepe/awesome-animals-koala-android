@@ -29,20 +29,20 @@
 
         <ImageView
             android:id="@+id/btnMute"
-            android:layout_width="20sp"
-            android:layout_height="20sp"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
             android:background="@drawable/ic_music_on"
             android:contentDescription="@string/exit"
-            android:padding="16dp"
+            android:padding="32dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
             android:id="@+id/btnExit"
-            android:layout_width="20sp"
-            android:layout_height="20sp"
+            android:layout_width="25sp"
+            android:layout_height="25sp"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
             android:background="@drawable/ic_exit"
