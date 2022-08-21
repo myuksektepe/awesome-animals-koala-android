@@ -10,7 +10,6 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.activity.viewModels
-import androidx.core.content.ContextCompat
 import androidx.core.view.children
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
@@ -22,7 +21,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import obidahi.books.animals.R
-import obidahi.books.animals.databinding.ActivityBookBinding
+import obidahi.books.animals.databinding.ActivityBookAltBinding
 import obidahi.books.animals.domain.model.BookDataModel
 import obidahi.books.animals.domain.model.BookPageModel
 import obidahi.books.animals.prensentation.adapter.ViewPager2Adapter
@@ -40,8 +39,8 @@ import java.io.File
 
 
 @AndroidEntryPoint
-class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookBinding>() {
-    override val layoutRes: Int = R.layout.activity_book
+class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookAltBinding>() {
+    override val layoutRes: Int = R.layout.activity_book_alt
     override val viewModel: BookActivityViewModel by viewModels()
     override var viewLifeCycleOwner: LifecycleOwner = this
     override fun obverseViewModel() {}
@@ -61,8 +60,8 @@ class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookBinding>() 
 
         when (context.resources?.configuration?.uiMode?.and(Configuration.UI_MODE_NIGHT_MASK)) {
             Configuration.UI_MODE_NIGHT_YES -> {
-                binding.imgBackground.setColorFilter(ContextCompat.getColor(context, R.color.black_90), android.graphics.PorterDuff.Mode.DARKEN)
-                binding.imgCircle.setColorFilter(ContextCompat.getColor(context, R.color.black_90), android.graphics.PorterDuff.Mode.DARKEN)
+                //binding.imgBackground.setColorFilter(ContextCompat.getColor(context, R.color.black_90), android.graphics.PorterDuff.Mode.DARKEN)
+                //binding.imgCircle.setColorFilter(ContextCompat.getColor(context, R.color.black_90), android.graphics.PorterDuff.Mode.DARKEN)
             }
         }
 
@@ -78,6 +77,9 @@ class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookBinding>() 
             fragmentList.clear()
 
             bookData?.let {
+
+                // Book Title
+                binding.txtBookTitle.text = it.bookTitle
 
                 // Background Image
                 val backgroundImage = "$destinationFolder/${it.backgroundImage}"
@@ -117,7 +119,7 @@ class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookBinding>() 
                 val pageAdapter = ViewPager2Adapter(this@BookActivity, fragmentList)
 
                 // ViewPager 2
-                binding.viewPager2.apply {
+                binding.viewPager.apply {
                     currentItem = currentPage
                     offscreenPageLimit = 1
                     isUserInputEnabled = false
@@ -136,8 +138,8 @@ class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookBinding>() 
         }
 
         // Buttons
-        binding.btnNext.setOnClickListener { binding.viewPager2.nextPage() }
-        binding.btnPrev.setOnClickListener { binding.viewPager2.previousPage() }
+        binding.btnNext.setOnClickListener { binding.viewPager.nextPage() }
+        binding.btnPrev.setOnClickListener { binding.viewPager.previousPage() }
         binding.btnMute.setOnClickListener { button ->
             mediaPlayer?.let {
                 if (it.isPlaying) {
@@ -156,6 +158,9 @@ class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookBinding>() 
 
     private fun pageChanged(pageNumber: Int) {
         Log.i(TAG, "Page Changed: $pageNumber")
+
+        // Change page number
+        binding.txtPageNumber.text = "${pageNumber + 1} / ${bookData!!.pages.size + 1}"
 
         // Disable Buttons
         disableButtons()
@@ -273,7 +278,7 @@ class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookBinding>() 
 
     @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
-        if (binding.viewPager2.currentItem == 0) {
+        if (binding.viewPager.currentItem == 0) {
             //super.onBackPressed()
             closeBook()
         } else {

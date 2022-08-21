@@ -1,5 +1,6 @@
 package obidahi.books.animals.prensentation.view.fragment
 
+import android.animation.ObjectAnimator
 import android.content.Context
 import android.media.AudioAttributes
 import android.media.MediaPlayer
@@ -16,7 +17,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import obidahi.books.animals.R
-import obidahi.books.animals.databinding.FragmentPageBinding
+import obidahi.books.animals.databinding.FragmentPageAltBinding
 import obidahi.books.animals.domain.model.BookPageModel
 import obidahi.books.animals.prensentation.base.BaseFragment
 import obidahi.books.animals.prensentation.viewmodel.PageFragmentViewModel
@@ -31,14 +32,14 @@ import java.io.File
 private const val PAGE_MODEL = "PAGE_MODEL"
 
 @AndroidEntryPoint
-class PageFragment : BaseFragment<PageFragmentViewModel, FragmentPageBinding>() {
+class PageFragment : BaseFragment<PageFragmentViewModel, FragmentPageAltBinding>() {
     private lateinit var pageModel: BookPageModel
     private lateinit var video: String
     private lateinit var image: String
     private lateinit var voice: String
     private val alt = false
     private var mediaPlayer: MediaPlayer? = null
-    override val layoutRes: Int = R.layout.fragment_page
+    override val layoutRes: Int = R.layout.fragment_page_alt
     override val viewModel: PageFragmentViewModel by viewModels()
     override fun observeViewModel() {}
 
@@ -78,6 +79,14 @@ class PageFragment : BaseFragment<PageFragmentViewModel, FragmentPageBinding>() 
 
     override fun onResume() {
         super.onResume()
+
+        ObjectAnimator.ofFloat(binding.cardView, View.ROTATION, -8f, 8f).apply {
+            duration = 5000
+            repeatCount = 10
+            repeatMode = ObjectAnimator.REVERSE
+            start()
+        }
+
 
         // Video
         if (File(video).exists()) {

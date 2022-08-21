@@ -7,6 +7,7 @@ import kotlinx.serialization.Serializable
 @Parcelize
 @Serializable
 data class BookDataModel(
+    val bookTitle: String,
     val packageFile: String,
     val packageSize: String,
     val packageItemsCount: Int,

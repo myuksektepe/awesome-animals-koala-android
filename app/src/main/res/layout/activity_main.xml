@@ -12,11 +12,12 @@
         tools:context=".prensentation.view.activity.MainActivity">
 
         <ImageView
+            android:id="@+id/imgBackground"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:src="@drawable/page_background"
             android:scaleType="centerCrop"
-            android:id="@+id/imgBackground" />
+            android:src="@drawable/page_background"
+            android:visibility="gone" />
 
         <FrameLayout
             android:id="@+id/frmHome"
@@ -40,6 +41,7 @@
                     app:cardElevation="16dp">
 
                     <ImageView
+                        android:id="@+id/imgBookCover"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:src="@drawable/icon" />

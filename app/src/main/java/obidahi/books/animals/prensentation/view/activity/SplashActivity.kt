@@ -24,7 +24,7 @@ class SplashActivity : BaseActivity<SplashActivityViewModel, ActivitySplashBindi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val intro = "android.resource://$packageName/raw/intro"
+        val intro = "android.resource://$packageName/raw/logo_intro"
 
         binding.videoSplash.apply {
             visibility = View.VISIBLE
@@ -33,6 +33,8 @@ class SplashActivity : BaseActivity<SplashActivityViewModel, ActivitySplashBindi
                 it.isLooping = false
                 it.setVolume(.2f, .2f)
 
+                // Fullscren video
+                /*
                 val videoRatio = it.videoWidth / it.videoHeight.toFloat()
                 val screenRatio = this.width / this.height.toFloat()
                 val scaleX = videoRatio / screenRatio
@@ -41,6 +43,8 @@ class SplashActivity : BaseActivity<SplashActivityViewModel, ActivitySplashBindi
                 } else {
                     this.scaleY = 1f / scaleX
                 }
+                 */
+
                 //setZOrderOnTop(true)
                 it.start()
             }
@@ -57,6 +61,7 @@ class SplashActivity : BaseActivity<SplashActivityViewModel, ActivitySplashBindi
             setOnInfoListener { mp, what, extra ->
                 Log.i(TAG, "$mp, $what, $extra")
                 if (what == MediaPlayer.MEDIA_INFO_VIDEO_RENDERING_START) {
+                    binding.placeholder.visibility = View.GONE
                     true
                 }
                 false

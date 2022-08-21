@@ -16,4 +16,7 @@
     <color name="background">#FAFAFA</color>
     <color name="background_70">#70FAFAFA</color>
     <color name="textColor">#232323</color>
+
+    <color name="topTitle">#632f9e</color>
+    <color name="secondTitle">#f5821b</color>
 </resources>
