@@ -73,6 +73,14 @@ class PageFragment : BaseFragment<PageFragmentViewModel, FragmentPageAltBinding>
                 .load(image)
                 .centerCrop()
                 .into(binding.imageBackground)
+
+            // Image Owner
+            pageModel.imageOwner.let {
+                binding.txtMediaOwner.run {
+                    this.visibility = View.VISIBLE
+                    text = it
+                }
+            }
         }
 
     }
@@ -97,6 +105,7 @@ class PageFragment : BaseFragment<PageFragmentViewModel, FragmentPageAltBinding>
                     it.isLooping = true
                     it.setVolume(0f, 0f)
 
+                    /*
                     val videoRatio = it.videoWidth / it.videoHeight.toFloat()
                     val screenRatio = this.width / this.height.toFloat()
                     val scaleX = videoRatio / screenRatio
@@ -106,6 +115,8 @@ class PageFragment : BaseFragment<PageFragmentViewModel, FragmentPageAltBinding>
                         this.scaleY = 1f / scaleX
                     }
                     //setZOrderOnTop(true)
+                     */
+
                     it.start()
                 }
                 setOnCompletionListener {
@@ -120,6 +131,16 @@ class PageFragment : BaseFragment<PageFragmentViewModel, FragmentPageAltBinding>
                 setOnInfoListener { mp, what, extra ->
                     if (what == MediaPlayer.MEDIA_INFO_VIDEO_RENDERING_START) {
                         binding.imageBackground.startAnimation(requireContext().animFadeOut())
+
+                        // Video Owner
+                        binding.txtMediaOwner.visibility = View.GONE
+                        pageModel.videoOwner.let {
+                            binding.txtMediaOwner.run {
+                                this.visibility = View.VISIBLE
+                                text = it
+                            }
+                        }
+
                         true
                     }
                     false

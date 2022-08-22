@@ -77,7 +77,7 @@ object UnzipUtils {
 
                     val progress = (((index.toFloat() + 1) / entires.size.toFloat()) * 100f).roundToInt()
                     send(UnzipStatus.Progress(progress))
-                    kotlinx.coroutines.delay(100)
+                    kotlinx.coroutines.delay(10)
                 }
                 Log.i(TAG, "Unzip ___ Tüm dosyalar eklendi")
                 send(UnzipStatus.Success)
