@@ -1,5 +1,6 @@
 package obidahi.books.animals.prensentation.view.activity
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.Configuration
 import android.media.AudioAttributes
@@ -21,14 +22,13 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import obidahi.books.animals.R
-import obidahi.books.animals.databinding.ActivityBookAltBinding
+import obidahi.books.animals.databinding.ActivityBookBinding
 import obidahi.books.animals.domain.model.BookDataModel
 import obidahi.books.animals.domain.model.BookPageModel
-import obidahi.books.animals.prensentation.adapter.ViewPager2Adapter
+import obidahi.books.animals.prensentation.adapter.ViewPagerAdapter
 import obidahi.books.animals.prensentation.base.BaseActivity
 import obidahi.books.animals.prensentation.view.fragment.PageFragment
 import obidahi.books.animals.prensentation.viewmodel.BookActivityViewModel
-import obidahi.books.animals.util.BOOK_NAME
 import obidahi.books.animals.util.TAG
 import obidahi.books.animals.util.ViewExtensions.animSlideInDown
 import obidahi.books.animals.util.ViewExtensions.animSlideOutDown
@@ -39,8 +39,8 @@ import java.io.File
 
 
 @AndroidEntryPoint
-class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookAltBinding>() {
-    override val layoutRes: Int = R.layout.activity_book_alt
+class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookBinding>() {
+    override val layoutRes: Int = R.layout.activity_book
     override val viewModel: BookActivityViewModel by viewModels()
     override var viewLifeCycleOwner: LifecycleOwner = this
     override fun obverseViewModel() {}
@@ -50,13 +50,12 @@ class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookAltBinding>
     private var jobTimer: Job? = null
     private val context: Context = this
     private var bookData: BookDataModel? = null
+    private var FOLDER_NAME: String = ""
     private var mediaPlayer: MediaPlayer? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        val destinationFolder = "${getDir("packages", Context.MODE_PRIVATE)}/$BOOK_NAME"
 
         when (context.resources?.configuration?.uiMode?.and(Configuration.UI_MODE_NIGHT_MASK)) {
             Configuration.UI_MODE_NIGHT_YES -> {
@@ -65,11 +64,15 @@ class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookAltBinding>
             }
         }
 
+        FOLDER_NAME = intent.getStringExtra("FOLDER_NAME").toString()
         bookData = if (Build.VERSION.SDK_INT >= 33) {
             intent.getParcelableExtra("BOOK_DATA", BookDataModel::class.java)
         } else {
             intent.getParcelableExtra<BookDataModel>("BOOK_DATA")
         }
+
+        val destinationFolder = "${getDir("packages", Context.MODE_PRIVATE)}/$FOLDER_NAME"
+
 
         lifecycleScope.launchWhenCreated {
 
@@ -111,12 +114,12 @@ class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookAltBinding>
                             time = page.time,
                             isActive = page.isActive
                         )
-                        fragmentList.add(PageFragment.newInstance(pageModel))
+                        fragmentList.add(PageFragment.newInstance(pageModel, FOLDER_NAME))
                     }
                 }
 
                 // Adapter
-                val pageAdapter = ViewPager2Adapter(this@BookActivity, fragmentList)
+                val pageAdapter = ViewPagerAdapter(this@BookActivity, fragmentList)
 
                 // ViewPager 2
                 binding.viewPager.apply {
@@ -140,6 +143,7 @@ class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookAltBinding>
         // Buttons
         binding.btnNext.setOnClickListener { binding.viewPager.nextPage() }
         binding.btnPrev.setOnClickListener { binding.viewPager.previousPage() }
+        binding.btnClose.setOnClickListener { closeBook() }
         binding.btnMute.setOnClickListener { button ->
             mediaPlayer?.let {
                 if (it.isPlaying) {
@@ -156,6 +160,7 @@ class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookAltBinding>
         binding.btnExit.setOnClickListener { closeBook() }
     }
 
+    @SuppressLint("SetTextI18n")
     private fun pageChanged(pageNumber: Int) {
         Log.i(TAG, "Page Changed: $pageNumber")
 
@@ -179,8 +184,10 @@ class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookAltBinding>
 
         if (pageNumber == (bookData!!.pages.size - 1)) {
             binding.btnNext.visibility = View.GONE
+            binding.btnClose.visibility = View.VISIBLE
         } else {
             binding.btnNext.visibility = View.VISIBLE
+            binding.btnClose.visibility = View.GONE
         }
 
         jobTimer?.cancel()
@@ -221,7 +228,7 @@ class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookAltBinding>
     private fun closeBook() {
         showCustomDialog(
             title = getString(R.string.are_you_sure),
-            message = getString(R.string.exit_to_book),
+            message = getString(R.string.are_you_sure_exit_to_book),
             cancelable = false,
             positiveButtonText = getString(R.string.no),
             negativeButtonText = getString(R.string.yes),
@@ -238,7 +245,7 @@ class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookAltBinding>
     override fun onResume() {
         super.onResume()
         // Song
-        val destinationFolder = "${getDir("packages", Context.MODE_PRIVATE)}/$BOOK_NAME"
+        val destinationFolder = "${getDir("packages", Context.MODE_PRIVATE)}/$FOLDER_NAME"
         val songPath = "$destinationFolder/${bookData?.backgroundSong}"
 
         binding.btnMute.setBackgroundResource(R.drawable.ic_music_on)

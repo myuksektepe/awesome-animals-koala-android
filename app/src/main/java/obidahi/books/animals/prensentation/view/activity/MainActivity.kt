@@ -1,6 +1,7 @@
 package obidahi.books.animals.prensentation.view.activity
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -15,6 +16,7 @@ import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
+import com.bumptech.glide.Glide
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -24,11 +26,10 @@ import obidahi.books.animals.R
 import obidahi.books.animals.databinding.ActivityMainBinding
 import obidahi.books.animals.domain.model.BookDataModel
 import obidahi.books.animals.domain.model.DownloadStatus
-import obidahi.books.animals.domain.model.ResultState
 import obidahi.books.animals.domain.model.UnzipStatus
 import obidahi.books.animals.prensentation.base.BaseActivity
 import obidahi.books.animals.prensentation.viewmodel.MainActivityViewModel
-import obidahi.books.animals.util.BOOK_NAME
+import obidahi.books.animals.util.ResultState
 import obidahi.books.animals.util.TAG
 import obidahi.books.animals.util.ViewExtensions.animBounce
 import obidahi.books.animals.util.ViewExtensions.animFadeIn
@@ -58,6 +59,8 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
     private var readPermissionGranted = false
     private var writePermissionGranted = false
     private lateinit var permissionsLauncher: ActivityResultLauncher<Array<String>>
+    private lateinit var FOLDER_NAME: String
+    private lateinit var coverImage: String
 
     override fun obverseViewModel() {
         // Network Status
@@ -149,7 +152,10 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
         super.onCreate(savedInstanceState)
         filePackageFile = null
         tempUnit = { runJob() }
-        destinationFolder = "${getDir("packages", Context.MODE_PRIVATE)}/$BOOK_NAME"
+
+        coverImage = intent.getStringExtra("coverImage").toString()
+        FOLDER_NAME = intent.getStringExtra("FOLDER_NAME").toString()
+        destinationFolder = "${getDir("packages", Context.MODE_PRIVATE)}/$FOLDER_NAME"
         //val destination = "${Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath}/animals"
 
         when (context.resources?.configuration?.uiMode?.and(Configuration.UI_MODE_NIGHT_MASK)) {
@@ -158,10 +164,19 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
             }
         }
 
+        // Book Image
+        Glide
+            .with(context)
+            .load(coverImage)
+            .centerCrop()
+            .into(binding.imgBookCoverImage)
+
+
         permissionRequest()
         runJob()
     }
 
+    @SuppressLint("SetTextI18n")
     private fun runJob() {
         hideDialog()
         hideLoading()
@@ -220,7 +235,7 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
 
     private suspend fun getBookData() {
         if (isNetworkAvailable()) {
-            viewModel.getBookData()
+            viewModel.getBookData(FOLDER_NAME)
         } else {
             noNetworkConnection()
         }
@@ -257,7 +272,7 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
             binding.lnrDownloading.visibility = View.VISIBLE
             binding.txtDownloadState.text = getString(R.string.downloading)
 
-            viewModel.downloadFile(filePackageFile!!, bookData!!.packageFile)
+            viewModel.downloadFile(FOLDER_NAME, filePackageFile!!, bookData!!.packageFile)
         }
         Log.i(TAG, "Download ___ Job: $downloadJob")
     }
@@ -299,6 +314,7 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
         binding.btnOpenBook.setOnClickListener {
             val intent = Intent(context, BookActivity::class.java)
             intent.putExtra("BOOK_DATA", bookData)
+            intent.putExtra("FOLDER_NAME", FOLDER_NAME)
             startActivity(intent)
         }
     }

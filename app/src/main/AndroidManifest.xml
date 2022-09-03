@@ -17,15 +17,18 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AwesomeAnimals">
         <activity
-            android:name=".prensentation.view.activity.SplashActivity"
-            android:exported="true"
-            android:screenOrientation="portrait">
+            android:name=".prensentation.view.activity.DashboardActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".prensentation.view.activity.SplashActivity"
+            android:exported="true"
+            android:screenOrientation="portrait"></activity>
         <activity
             android:name=".prensentation.view.activity.BookActivity"
             android:exported="false"

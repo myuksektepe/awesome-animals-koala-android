@@ -17,7 +17,11 @@
     <string name="completed">Tamamlandı</string>
     <string name="try_again">Tekrar Dene</string>
     <string name="loading">Yükleniyor…</string>
+    <string name="download">İndir</string>
     <string name="downloading">İndiriliyor…</string>
+    <string name="contiune_to_read">Okumaya Devam Et</string>
+    <string name="update">Güncelle</string>
+    <string name="read">Oku</string>
     <string name="quick_search">Hızlı arama…</string>
 
 
@@ -43,5 +47,6 @@
     <string name="prev_icon" translatable="false"><![CDATA[<]]></string>
     <string name="next_icon" translatable="false"><![CDATA[>]]></string>
     <string name="are_you_sure">Emin Misiniz?</string>
-    <string name="exit_to_book">Kitabı kapatmak istediğinize emin misiniz?</string>
+    <string name="are_you_sure_exit_to_book">Kitabı kapatmak istediğinize emin misiniz?</string>
+    <string name="close_book">Kitabı Kapat</string>
 </resources>

@@ -7,6 +7,7 @@ import io.ktor.client.features.*
 import io.ktor.client.features.json.*
 import io.ktor.client.features.json.serializer.*
 import io.ktor.client.features.logging.*
+import io.ktor.http.*
 import obidahi.books.animals.util.TAG
 
 object KtorClient {
@@ -18,11 +19,12 @@ object KtorClient {
     val httpClient = HttpClient(Android) {
 
         install(JsonFeature) {
+            accept(ContentType.Application.Json)
             serializer = KotlinxSerializer(json)
         }
 
         install(Logging) {
-            level = LogLevel.NONE
+            level = LogLevel.HEADERS
             logger = object : Logger {
                 override fun log(message: String) {
                     Log.i(TAG, "Ktor Log: $message")

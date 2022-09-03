@@ -19,7 +19,7 @@
         <androidx.cardview.widget.CardView
             android:id="@+id/cardView"
             android:layout_width="220dp"
-            android:layout_height="350dp"
+            android:layout_height="375dp"
             android:layout_marginEnd="-16dp"
             android:foregroundGravity="center"
             android:rotation="-3"
@@ -96,7 +96,7 @@
                     android:inputType="textMultiLine"
                     android:singleLine="false"
                     android:text="@string/lipsum"
-                    android:textSize="17sp" />
+                    android:textSize="23sp" />
 
             </LinearLayout>
         </ScrollView>

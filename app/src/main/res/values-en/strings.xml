@@ -16,7 +16,11 @@
     <string name="completed">Completed</string>
     <string name="try_again">Try Again</string>
     <string name="loading">Loading…</string>
+    <string name="download">Download</string>
     <string name="downloading">Downloading…</string>
+    <string name="contiune_to_read">Contiune to Read</string>
+    <string name="update">Update</string>
+    <string name="read">Read</string>
     <string name="quick_search">Quick Search…</string>
 
     <string name="open_the_book">Open The Book</string>
@@ -39,5 +43,6 @@
     <string name="prev_page">Prev Page</string>
     <string name="exit">Exit</string>
     <string name="are_you_sure">Are You Sure?</string>
-    <string name="exit_to_book">You are about exit to book, are you sure?</string>
+    <string name="are_you_sure_exit_to_book">You are about exit to book, are you sure?</string>
+    <string name="close_book">Close Book</string>
 </resources>

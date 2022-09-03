@@ -1,4 +1,4 @@
-package obidahi.books.animals.domain.model
+package obidahi.books.animals.util
 
 sealed class ResultState<out R> {
     class LOADING<T> : ResultState<T>()

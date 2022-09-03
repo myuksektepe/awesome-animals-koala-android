@@ -30,17 +30,17 @@ object ViewExtensions {
         negativeButtonCallback: () -> (Unit)?,
         cancelable: Boolean = false
     ) {
-        val dialog = Dialog(this, R.style.CustomDialog)
-        dialog.apply {
+        val customDialog = Dialog(this, R.style.CustomDialog)
+        customDialog.apply {
             requestWindowFeature(Window.FEATURE_NO_TITLE)
             setCancelable(cancelable)
             setContentView(R.layout.custom_dialog)
         }
 
-        val dialogTitle = dialog.findViewById<TextView>(R.id.dialogTitle)
-        val dialogMessage = dialog.findViewById<TextView>(R.id.dialogMessage)
-        val dialogPossitiveButton = dialog.findViewById<Button>(R.id.dialogPossitiveButton)
-        val dialogNegativeButton = dialog.findViewById<Button>(R.id.dialogNegativeButton)
+        val dialogTitle = customDialog.findViewById<TextView>(R.id.dialogTitle)
+        val dialogMessage = customDialog.findViewById<TextView>(R.id.dialogMessage)
+        val dialogPossitiveButton = customDialog.findViewById<Button>(R.id.dialogPossitiveButton)
+        val dialogNegativeButton = customDialog.findViewById<Button>(R.id.dialogNegativeButton)
 
         dialogTitle.text = title
         dialogMessage.text = message
@@ -60,18 +60,16 @@ object ViewExtensions {
         }
 
         dialogPossitiveButton.setOnClickListener {
-            positiveButtonCallback() ?: run {
-                dialog.dismiss()
-            }
+            customDialog.dismiss()
+            positiveButtonCallback()
         }
 
         dialogNegativeButton.setOnClickListener {
-            negativeButtonCallback() ?: run {
-                dialog.dismiss()
-            }
+            customDialog.dismiss()
+            negativeButtonCallback()
         }
 
-        if (!dialog.isShowing) dialog.show()
+        if (!customDialog.isShowing) customDialog.show()
     }
 
 

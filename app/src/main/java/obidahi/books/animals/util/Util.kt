@@ -112,5 +112,23 @@ object UnzipUtils {
      * Size of the buffer to read/write data
      */
     private const val BUFFER_SIZE = 4096
+}
 
+
+fun Context.isBookDownloaded(packageFile: String): Boolean {
+    val file = File("${getDir("packages", Context.MODE_PRIVATE)}/${packageFile}")
+    return file.exists()
+}
+
+fun isBookExtracted(destinationFolder: String, packageItemCount: Int): Boolean {
+    val destFolder = File(destinationFolder)
+    if (destFolder.exists()) {
+        val fileList = destFolder.list()
+        if (fileList != null) {
+            if (fileList.size == packageItemCount) {
+                return true
+            }
+        }
+    }
+    return false
 }

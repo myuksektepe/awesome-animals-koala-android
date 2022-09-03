@@ -33,7 +33,7 @@ class SplashActivity : BaseActivity<SplashActivityViewModel, ActivitySplashBindi
                 it.isLooping = false
                 it.setVolume(.2f, .2f)
 
-                // Fullscren video
+                // Fullscreen video
                 /*
                 val videoRatio = it.videoWidth / it.videoHeight.toFloat()
                 val screenRatio = this.width / this.height.toFloat()
@@ -49,7 +49,7 @@ class SplashActivity : BaseActivity<SplashActivityViewModel, ActivitySplashBindi
                 it.start()
             }
             setOnCompletionListener {
-                startActivity(Intent(this@SplashActivity, MainActivity::class.java))
+                startActivity(Intent(this@SplashActivity, DashboardActivity::class.java))
                 finish()
             }
             setOnErrorListener { mp, what, extra ->

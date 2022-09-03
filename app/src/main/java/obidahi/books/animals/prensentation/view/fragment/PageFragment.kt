@@ -21,7 +21,6 @@ import obidahi.books.animals.databinding.FragmentPageAltBinding
 import obidahi.books.animals.domain.model.BookPageModel
 import obidahi.books.animals.prensentation.base.BaseFragment
 import obidahi.books.animals.prensentation.viewmodel.PageFragmentViewModel
-import obidahi.books.animals.util.BOOK_NAME
 import obidahi.books.animals.util.TAG
 import obidahi.books.animals.util.ViewExtensions.animFadeIn
 import obidahi.books.animals.util.ViewExtensions.animFadeOut
@@ -29,11 +28,13 @@ import obidahi.books.animals.util.ViewExtensions.animSlideInDown
 import obidahi.books.animals.util.ViewExtensions.animSlideInUp
 import java.io.File
 
-private const val PAGE_MODEL = "PAGE_MODEL"
+private const val _PAGE_MODEL = "PAGE_MODEL"
+private const val _FOLDER_NAME = "FOLDER_NAME"
 
 @AndroidEntryPoint
 class PageFragment : BaseFragment<PageFragmentViewModel, FragmentPageAltBinding>() {
     private lateinit var pageModel: BookPageModel
+    private lateinit var FOLDER_NAME: String
     private lateinit var video: String
     private lateinit var image: String
     private lateinit var voice: String
@@ -47,17 +48,19 @@ class PageFragment : BaseFragment<PageFragmentViewModel, FragmentPageAltBinding>
         super.onCreate(savedInstanceState)
         arguments?.let {
             pageModel = if (Build.VERSION.SDK_INT >= 33) {
-                it.getParcelable(PAGE_MODEL, BookPageModel::class.java)!!
+                it.getParcelable(_PAGE_MODEL, BookPageModel::class.java)!!
             } else {
-                it.getParcelable(PAGE_MODEL)!!
+                it.getParcelable(_PAGE_MODEL)!!
             }
+
+            FOLDER_NAME = it.getString(_FOLDER_NAME).toString()
         }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val destinationFolder = "${requireActivity().getDir("packages", Context.MODE_PRIVATE)}/$BOOK_NAME"
+        val destinationFolder = "${requireActivity().getDir("packages", Context.MODE_PRIVATE)}/$FOLDER_NAME"
         video = "$destinationFolder/${pageModel.video}"
         image = "$destinationFolder/${pageModel.image}"
         voice = "$destinationFolder/${pageModel.voice}"
@@ -198,7 +201,6 @@ class PageFragment : BaseFragment<PageFragmentViewModel, FragmentPageAltBinding>
                 startAnimation(requireContext().animSlideInUp())
             }
         }
-
     }
 
     override fun onPause() {
@@ -216,11 +218,13 @@ class PageFragment : BaseFragment<PageFragmentViewModel, FragmentPageAltBinding>
     companion object {
         @JvmStatic
         fun newInstance(
-            pageModel: BookPageModel
+            pageModel: BookPageModel,
+            FOLDER_NAME: String
         ) =
             PageFragment().apply {
                 arguments = Bundle().apply {
-                    putParcelable(PAGE_MODEL, pageModel as Parcelable)
+                    putParcelable(_PAGE_MODEL, pageModel as Parcelable)
+                    putString(_FOLDER_NAME, FOLDER_NAME)
                 }
             }
     }

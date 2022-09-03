@@ -5,9 +5,9 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import obidahi.books.animals.data.repository.RemoteRepository
 import obidahi.books.animals.domain.model.BookDataModel
 import obidahi.books.animals.domain.model.DownloadStatus
-import obidahi.books.animals.domain.model.ResultState
 import obidahi.books.animals.domain.model.UnzipStatus
 import obidahi.books.animals.prensentation.base.BaseViewModel
+import obidahi.books.animals.util.ResultState
 import obidahi.books.animals.util.UnzipUtils.unzip
 import java.io.File
 import javax.inject.Inject
@@ -26,14 +26,14 @@ class MainActivityViewModel @Inject constructor(
     private val _unzipState: MutableLiveData<UnzipStatus> = MutableLiveData()
     val unzipState get() = _unzipState
 
-    suspend fun getBookData() {
-        remoteRepository.getBookData().collect {
+    suspend fun getBookData(FOLDER_NAME: String) {
+        remoteRepository.getBookData(FOLDER_NAME).collect {
             _getBookDataState.postValue(it)
         }
     }
 
-    suspend fun downloadFile(file: File, fileName: String) {
-        remoteRepository.downloadFile(file, fileName).collect {
+    suspend fun downloadFile(FOLDER_NAME: String, FILE: File, FILE_NAME: String) {
+        remoteRepository.downloadFile(FOLDER_NAME, FILE, FILE_NAME).collect {
             _downloadState.postValue(it)
         }
     }
