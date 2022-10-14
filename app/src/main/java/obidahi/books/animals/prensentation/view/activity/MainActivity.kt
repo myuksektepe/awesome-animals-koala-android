@@ -29,6 +29,7 @@ import obidahi.books.animals.domain.model.DownloadStatus
 import obidahi.books.animals.domain.model.UnzipStatus
 import obidahi.books.animals.prensentation.base.BaseActivity
 import obidahi.books.animals.prensentation.viewmodel.MainActivityViewModel
+import obidahi.books.animals.util.CustomDialog
 import obidahi.books.animals.util.ResultState
 import obidahi.books.animals.util.TAG
 import obidahi.books.animals.util.ViewExtensions.animBounce
@@ -59,8 +60,10 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
     private var readPermissionGranted = false
     private var writePermissionGranted = false
     private lateinit var permissionsLauncher: ActivityResultLauncher<Array<String>>
-    private lateinit var FOLDER_NAME: String
+    private lateinit var folderName: String
     private lateinit var coverImage: String
+
+    private lateinit var customDialog: CustomDialog
 
     override fun obverseViewModel() {
         // Network Status
@@ -150,12 +153,13 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        customDialog = CustomDialog.getInstance(context)
         filePackageFile = null
         tempUnit = { runJob() }
 
         coverImage = intent.getStringExtra("coverImage").toString()
-        FOLDER_NAME = intent.getStringExtra("FOLDER_NAME").toString()
-        destinationFolder = "${getDir("packages", Context.MODE_PRIVATE)}/$FOLDER_NAME"
+        folderName = intent.getStringExtra("folderName").toString()
+        destinationFolder = "${getDir("packages", Context.MODE_PRIVATE)}/$folderName"
         //val destination = "${Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath}/animals"
 
         when (context.resources?.configuration?.uiMode?.and(Configuration.UI_MODE_NIGHT_MASK)) {
@@ -235,7 +239,7 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
 
     private suspend fun getBookData() {
         if (isNetworkAvailable()) {
-            viewModel.getBookData(FOLDER_NAME)
+            viewModel.getBookData(folderName)
         } else {
             noNetworkConnection()
         }
@@ -272,7 +276,7 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
             binding.lnrDownloading.visibility = View.VISIBLE
             binding.txtDownloadState.text = getString(R.string.downloading)
 
-            viewModel.downloadFile(FOLDER_NAME, filePackageFile!!, bookData!!.packageFile)
+            viewModel.downloadFile(folderName, filePackageFile!!, bookData!!.packageFile)
         }
         Log.i(TAG, "Download ___ Job: $downloadJob")
     }
@@ -314,14 +318,14 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
         binding.btnOpenBook.setOnClickListener {
             val intent = Intent(context, BookActivity::class.java)
             intent.putExtra("BOOK_DATA", bookData)
-            intent.putExtra("FOLDER_NAME", FOLDER_NAME)
+            intent.putExtra("folderName", folderName)
             startActivity(intent)
         }
     }
 
     /* Popup Messages */
     private fun noNetworkConnection() {
-        showDialog(
+        customDialog.show(
             title = getString(R.string.network_connection_error_title),
             message = getString(R.string.network_connection_error_message),
             positiveButtonText = getString(R.string.yes),
@@ -335,9 +339,8 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
         downloadJob?.cancel()
         runJob?.cancel()
         hideLoading()
-        hideDialog()
 
-        showDialog(
+        customDialog.show(
             title = getString(R.string.warning),
             message = message,
             positiveButtonText = getString(R.string.try_again),
@@ -376,7 +379,7 @@ class MainActivity : BaseActivity<MainActivityViewModel, ActivityMainBinding>() 
                 Toast.makeText(context, "Environment.isExternalStorageManager()", Toast.LENGTH_SHORT).show()
             } else {
                 //request for the permission
-                val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
+                val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_fileS_ACCESS_PERMISSION)
                 val uri: Uri = Uri.fromParts("package", packageName, null)
                 intent.data = uri
                 startActivity(intent)

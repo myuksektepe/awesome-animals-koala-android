@@ -43,10 +43,10 @@ android {
 dependencies {
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
-    implementation "androidx.core:core-ktx:1.8.0"
+    implementation "androidx.core:core-ktx:1.9.0"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
-    def appcompat_version = "1.5.0"
+    def appcompat_version = "1.5.1"
     implementation "androidx.appcompat:appcompat:$appcompat_version"
 
     def material_version = "1.6.1"
@@ -61,13 +61,13 @@ dependencies {
     def cardview_version = "1.0.0"
     implementation "androidx.cardview:cardview:$cardview_version"
 
-    def core_ktx_version = "1.9.0-beta01"
+    def core_ktx_version = "1.9.0"
     implementation "androidx.core:core-ktx:$core_ktx_version"
 
-    def androidx_activity_ktx_version = "1.5.1"
+    def androidx_activity_ktx_version = "1.6.0"
     implementation "androidx.activity:activity-ktx:$androidx_activity_ktx_version"
 
-    def androidx_fragment_ktx_version = "1.5.2"
+    def androidx_fragment_ktx_version = "1.5.3"
     implementation "androidx.fragment:fragment-ktx:$androidx_fragment_ktx_version"
 
     def lifecycle_version = "2.5.1"

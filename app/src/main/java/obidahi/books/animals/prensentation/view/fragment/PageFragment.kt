@@ -29,12 +29,12 @@ import obidahi.books.animals.util.ViewExtensions.animSlideInUp
 import java.io.File
 
 private const val _PAGE_MODEL = "PAGE_MODEL"
-private const val _FOLDER_NAME = "FOLDER_NAME"
+private const val _folderName = "folderName"
 
 @AndroidEntryPoint
 class PageFragment : BaseFragment<PageFragmentViewModel, FragmentPageAltBinding>() {
     private lateinit var pageModel: BookPageModel
-    private lateinit var FOLDER_NAME: String
+    private lateinit var folderName: String
     private lateinit var video: String
     private lateinit var image: String
     private lateinit var voice: String
@@ -53,14 +53,14 @@ class PageFragment : BaseFragment<PageFragmentViewModel, FragmentPageAltBinding>
                 it.getParcelable(_PAGE_MODEL)!!
             }
 
-            FOLDER_NAME = it.getString(_FOLDER_NAME).toString()
+            folderName = it.getString(_folderName).toString()
         }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val destinationFolder = "${requireActivity().getDir("packages", Context.MODE_PRIVATE)}/$FOLDER_NAME"
+        val destinationFolder = "${requireActivity().getDir("packages", Context.MODE_PRIVATE)}/$folderName"
         video = "$destinationFolder/${pageModel.video}"
         image = "$destinationFolder/${pageModel.image}"
         voice = "$destinationFolder/${pageModel.voice}"
@@ -219,12 +219,12 @@ class PageFragment : BaseFragment<PageFragmentViewModel, FragmentPageAltBinding>
         @JvmStatic
         fun newInstance(
             pageModel: BookPageModel,
-            FOLDER_NAME: String
+            folderName: String
         ) =
             PageFragment().apply {
                 arguments = Bundle().apply {
                     putParcelable(_PAGE_MODEL, pageModel as Parcelable)
-                    putString(_FOLDER_NAME, FOLDER_NAME)
+                    putString(_folderName, folderName)
                 }
             }
     }

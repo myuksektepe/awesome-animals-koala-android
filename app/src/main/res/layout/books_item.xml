@@ -5,7 +5,7 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="132dp">
+        android:layout_height="wrap_content">
 
         <androidx.cardview.widget.CardView
             android:id="@+id/cardView2"
@@ -31,10 +31,32 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="8dp"
             android:text="Koala"
             app:layout_constraintStart_toEndOf="@+id/cardView2"
             app:layout_constraintTop_toTopOf="@id/cardView2" />
+
+        <TextView
+            android:id="@+id/txtBookPackageSize"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="99 MB"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="@+id/txtBookName"
+            app:layout_constraintStart_toEndOf="@+id/txtBookName"
+            app:layout_constraintTop_toTopOf="@+id/txtBookName" />
+
+        <TextView
+            android:id="@+id/txtPageCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="99"
+            android:layout_marginTop="8dp"
+            android:textSize="13sp"
+            app:layout_constraintEnd_toEndOf="@+id/cardView2"
+            app:layout_constraintStart_toStartOf="@+id/cardView2"
+            app:layout_constraintTop_toBottomOf="@+id/cardView2" />
 
         <Button
             android:id="@+id/btnBookDownload"
@@ -57,7 +79,6 @@
             style="@style/Widget.AppCompat.Button.Small"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
             android:minWidth="0dp"
             android:minHeight="0dp"
@@ -65,18 +86,8 @@
             android:textSize="11sp"
             app:backgroundTint="@color/readButton"
             app:icon="@drawable/ic_read"
-            app:layout_constraintStart_toEndOf="@id/btnBookDownload"
+            app:layout_constraintStart_toStartOf="@+id/txtBookName"
             app:layout_constraintTop_toBottomOf="@+id/txtBookName" />
 
-        <TextView
-            android:id="@+id/txtBookPackageSize"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:text="99 MB"
-            android:textSize="14sp"
-            app:layout_constraintBottom_toBottomOf="@+id/txtBookName"
-            app:layout_constraintStart_toEndOf="@+id/txtBookName"
-            app:layout_constraintTop_toTopOf="@+id/txtBookName" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

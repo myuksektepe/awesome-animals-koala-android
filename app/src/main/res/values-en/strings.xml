@@ -45,4 +45,6 @@
     <string name="are_you_sure">Are You Sure?</string>
     <string name="are_you_sure_exit_to_book">You are about exit to book, are you sure?</string>
     <string name="close_book">Close Book</string>
+    <string name="books">Books</string>
+    <string name="pages">Pages</string>
 </resources>

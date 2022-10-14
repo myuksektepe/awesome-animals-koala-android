@@ -5,7 +5,9 @@ import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import com.bumptech.glide.Glide
+import obidahi.books.animals.R
 import obidahi.books.animals.databinding.BooksItemBinding
+import obidahi.books.animals.databinding.TitleItemBinding
 import obidahi.books.animals.domain.model.BookItemButtonType
 import obidahi.books.animals.domain.model.DashboardRecyclerViewItem
 
@@ -17,6 +19,12 @@ import obidahi.books.animals.domain.model.DashboardRecyclerViewItem
  */
 sealed class DashboardRecyclerViewHolder(binding: ViewBinding) : RecyclerView.ViewHolder(binding.root) {
 
+    class TitleViewHolder(private val binding: TitleItemBinding) : DashboardRecyclerViewHolder(binding) {
+        fun bind(title: String) {
+            binding.txtTitle.text = title
+        }
+    }
+
     class BookViewHolder(private val binding: BooksItemBinding) : DashboardRecyclerViewHolder(binding) {
         @SuppressLint("SetTextI18n")
         fun bind(
@@ -26,6 +34,9 @@ sealed class DashboardRecyclerViewHolder(binding: ViewBinding) : RecyclerView.Vi
         ) {
             // Book Name
             binding.txtBookName.text = book.name
+
+            // Page Count
+            binding.txtPageCount.text = "${book.pageCount} ${binding.root.context.getString(R.string.pages)}"
 
             // Package Size
             binding.txtBookPackageSize.text = "(${book.packageSize})"

@@ -26,14 +26,14 @@ class MainActivityViewModel @Inject constructor(
     private val _unzipState: MutableLiveData<UnzipStatus> = MutableLiveData()
     val unzipState get() = _unzipState
 
-    suspend fun getBookData(FOLDER_NAME: String) {
-        remoteRepository.getBookData(FOLDER_NAME).collect {
+    suspend fun getBookData(folderName: String) {
+        remoteRepository.getBookData(folderName).collect {
             _getBookDataState.postValue(it)
         }
     }
 
-    suspend fun downloadFile(FOLDER_NAME: String, FILE: File, FILE_NAME: String) {
-        remoteRepository.downloadFile(FOLDER_NAME, FILE, FILE_NAME).collect {
+    suspend fun downloadFile(folderName: String, file: File, fileName: String) {
+        remoteRepository.downloadFile(folderName, file, fileName).collect {
             _downloadState.postValue(it)
         }
     }

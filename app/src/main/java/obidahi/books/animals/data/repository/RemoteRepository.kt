@@ -36,12 +36,12 @@ object RemoteRepository {
             }
         }.flowOn(Dispatchers.IO)
 
-    suspend fun getBookData(FOLDER_NAME: String) =
+    suspend fun getBookData(folderName: String) =
         channelFlow<ResultState<BookDataModel>> {
             send(ResultState.LOADING())
             runCatching {
                 try {
-                    val httpResponse: BookDataModel = KtorClient.httpClient.get("$BOOKS_URL/$FOLDER_NAME/data.json")
+                    val httpResponse: BookDataModel = KtorClient.httpClient.get("$booksUrl/$folderName/data.json")
                     send(ResultState.SUCCESS(httpResponse))
                 } catch (e: Exception) {
                     send(ResultState.FAIL(e.message.toString()))
@@ -49,11 +49,11 @@ object RemoteRepository {
             }
         }.flowOn(Dispatchers.IO)
 
-    suspend fun downloadFile(FOLDER_NAME: String, FILE: File, FILE_NAME: String) =
+    suspend fun downloadFile(folderName: String, file: File, fileName: String) =
         channelFlow {
             runCatching {
                 try {
-                    val httpResponse: HttpResponse = KtorClient.httpClient.get("$BOOKS_URL/$FOLDER_NAME/$FILE_NAME") {
+                    val httpResponse: HttpResponse = KtorClient.httpClient.get("$booksUrl/$folderName/$fileName") {
                         onDownload { bytesSentTotal, contentLength ->
                             //Log.i(TAG, "Received $bytesSentTotal bytes from $contentLength")
                             val progress = ((bytesSentTotal.toFloat() / contentLength.toFloat()) * 100).roundToInt()
@@ -62,8 +62,8 @@ object RemoteRepository {
                     }
 
                     val responseBody: ByteArray = httpResponse.receive()
-                    FILE.writeBytes(responseBody)
-                    Log.i(TAG, "Download ___ Dosya şuraya kaydedildi: ${FILE.path}")
+                    file.writeBytes(responseBody)
+                    Log.i(TAG, "Download ___ Dosya şuraya kaydedildi: ${file.path}")
                     send(DownloadStatus.Success)
 
                 } catch (e: Exception) {

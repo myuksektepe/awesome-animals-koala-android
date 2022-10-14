@@ -13,6 +13,10 @@ import kotlinx.serialization.Serializable
  */
 sealed class DashboardRecyclerViewItem {
 
+    class Title(
+        val title: String
+    ) : DashboardRecyclerViewItem()
+
     @Parcelize
     @Serializable
     class Book(
@@ -24,6 +28,12 @@ sealed class DashboardRecyclerViewItem {
 
         @SerialName("cover_image")
         val coverImage: String,
+
+        @SerialName("book_type")
+        val bookType: String,
+
+        @SerialName("page_count")
+        val pageCount: Int,
 
         @SerialName("package_size")
         val packageSize: String,

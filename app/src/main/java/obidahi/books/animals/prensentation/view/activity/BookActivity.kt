@@ -6,7 +6,6 @@ import android.content.res.Configuration
 import android.media.AudioAttributes
 import android.media.MediaPlayer
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -18,6 +17,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
 import com.bumptech.glide.Glide
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -29,6 +29,8 @@ import obidahi.books.animals.prensentation.adapter.ViewPagerAdapter
 import obidahi.books.animals.prensentation.base.BaseActivity
 import obidahi.books.animals.prensentation.view.fragment.PageFragment
 import obidahi.books.animals.prensentation.viewmodel.BookActivityViewModel
+import obidahi.books.animals.prensentation.viewmodel.MainActivityViewModel
+import obidahi.books.animals.util.ResultState
 import obidahi.books.animals.util.TAG
 import obidahi.books.animals.util.ViewExtensions.animSlideInDown
 import obidahi.books.animals.util.ViewExtensions.animSlideOutDown
@@ -42,17 +44,19 @@ import java.io.File
 class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookBinding>() {
     override val layoutRes: Int = R.layout.activity_book
     override val viewModel: BookActivityViewModel by viewModels()
+    private val viewModel2: MainActivityViewModel by viewModels()
     override var viewLifeCycleOwner: LifecycleOwner = this
-    override fun obverseViewModel() {}
 
     private var currentPage = 0
     private var mediaPlayerLength = 0
+    private var isSongStarted = false
+    private var isSongPlaying = false
     private var jobTimer: Job? = null
     private val context: Context = this
     private var bookData: BookDataModel? = null
-    private var FOLDER_NAME: String = ""
+    private var folderName: String = ""
     private var mediaPlayer: MediaPlayer? = null
-
+    private var destinationFolder: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -64,81 +68,20 @@ class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookBinding>() 
             }
         }
 
-        FOLDER_NAME = intent.getStringExtra("FOLDER_NAME").toString()
+        folderName = intent.getStringExtra("folderName").toString()
+        destinationFolder = "${getDir("packages", Context.MODE_PRIVATE)}/$folderName"
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            viewModel2.getBookData(folderName)
+        }
+
+        /*
         bookData = if (Build.VERSION.SDK_INT >= 33) {
             intent.getParcelableExtra("BOOK_DATA", BookDataModel::class.java)
         } else {
             intent.getParcelableExtra<BookDataModel>("BOOK_DATA")
         }
-
-        val destinationFolder = "${getDir("packages", Context.MODE_PRIVATE)}/$FOLDER_NAME"
-
-
-        lifecycleScope.launchWhenCreated {
-
-            val fragmentList = mutableListOf<Fragment>()
-            fragmentList.clear()
-
-            bookData?.let {
-
-                // Book Title
-                binding.txtBookTitle.text = it.bookTitle
-
-                // Background Image
-                val backgroundImage = "$destinationFolder/${it.backgroundImage}"
-                if (File(backgroundImage).exists()) {
-                    Glide
-                        .with(context)
-                        .load(backgroundImage)
-                        .centerCrop()
-                        .into(binding.imgBackground)
-                } else {
-                    Glide
-                        .with(context)
-                        .load(R.drawable.page_background)
-                        .centerCrop()
-                        .into(binding.imgBackground)
-                }
-
-                // Pages
-                for (page in it.pages) {
-                    if (page.isActive) {
-                        val pageModel = BookPageModel(
-                            title = page.title,
-                            message = page.message,
-                            video = page.video,
-                            videoOwner = page.videoOwner,
-                            image = page.image,
-                            imageOwner = page.imageOwner,
-                            voice = page.voice,
-                            time = page.time,
-                            isActive = page.isActive
-                        )
-                        fragmentList.add(PageFragment.newInstance(pageModel, FOLDER_NAME))
-                    }
-                }
-
-                // Adapter
-                val pageAdapter = ViewPagerAdapter(this@BookActivity, fragmentList)
-
-                // ViewPager 2
-                binding.viewPager.apply {
-                    currentItem = currentPage
-                    offscreenPageLimit = 1
-                    isUserInputEnabled = false
-                    adapter = pageAdapter
-                    //setPageTransformer(ZoomOutPageTransformer())
-                    /*
-                    setPageTransformer { page, position ->
-                        setParallaxTransformation(page, position)
-                    }
-                     */
-                    registerOnPageChangeCallback(viewpagerPageChangeCallback)
-                }
-
-                pageChanged(currentPage)
-            }
-        }
+         */
 
         // Buttons
         binding.btnNext.setOnClickListener { binding.viewPager.nextPage() }
@@ -146,18 +89,47 @@ class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookBinding>() 
         binding.btnClose.setOnClickListener { closeBook() }
         binding.btnMute.setOnClickListener { button ->
             mediaPlayer?.let {
-                if (it.isPlaying) {
+                if (isSongPlaying) {
                     it.pause()
                     mediaPlayerLength = it.currentPosition
                     button.setBackgroundResource(R.drawable.ic_music_off)
+                    isSongPlaying = false
                 } else {
                     it.seekTo(mediaPlayerLength)
                     it.start()
                     button.setBackgroundResource(R.drawable.ic_music_on)
+                    isSongPlaying = true
                 }
             }
         }
         binding.btnExit.setOnClickListener { closeBook() }
+    }
+
+    override fun obverseViewModel() {
+        // Book Data Status
+        viewModel2.getBookDataState.observe(viewLifeCycleOwner) {
+            when (it) {
+                is ResultState.LOADING -> {
+                    showLoading()
+                }
+                is ResultState.FAIL -> {
+                    hideLoading()
+                    showCustomDialog(
+                        getString(R.string.error),
+                        it.message,
+                        null,
+                        null,
+                        { null },
+                        { null }
+                    )
+                }
+                is ResultState.SUCCESS -> {
+                    hideLoading()
+                    bookData = it.data
+                    setBook()
+                }
+            }
+        }
     }
 
     @SuppressLint("SetTextI18n")
@@ -244,42 +216,8 @@ class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookBinding>() 
 
     override fun onResume() {
         super.onResume()
-        // Song
-        val destinationFolder = "${getDir("packages", Context.MODE_PRIVATE)}/$FOLDER_NAME"
-        val songPath = "$destinationFolder/${bookData?.backgroundSong}"
-
-        binding.btnMute.setBackgroundResource(R.drawable.ic_music_on)
-        mediaPlayer?.stop()
-        mediaPlayer?.release()
-        mediaPlayer = null
-        mediaPlayer = MediaPlayer().apply {
-            isLooping = true
-            setVolume(.1f, .1f)
-            setAudioAttributes(
-                AudioAttributes.Builder()
-                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                    .setUsage(AudioAttributes.USAGE_MEDIA)
-                    .build()
-            )
-            //setDataSource(context, Uri.parse(song))
-        }
-
-        if (!bookData?.backgroundSong.isNullOrBlank() && File(songPath).exists()) {
-            mediaPlayer?.setDataSource(context, Uri.parse(songPath))
-        } else {
-            val descriptor = assets.openFd("song.mp3")
-            mediaPlayer?.setDataSource(descriptor.fileDescriptor, descriptor.startOffset, descriptor.length)
-            descriptor.close()
-        }
-
-        mediaPlayer?.apply {
-            prepareAsync()
-            setOnPreparedListener {
-                it.start()
-            }
-            //prepare()
-            //start()
-            setOnErrorListener { _, _, _ -> true }
+        if (isSongStarted && isSongPlaying) {
+            playSong()
         }
     }
 
@@ -297,6 +235,116 @@ class BookActivity : BaseActivity<BookActivityViewModel, ActivityBookBinding>() 
         override fun onPageSelected(position: Int) {
             pageChanged(position)
             Log.i(TAG, "ViewPager ___ Position: $position")
+        }
+    }
+
+    private fun setBook() {
+        lifecycleScope.launch(Dispatchers.Main) {
+
+            val fragmentList = mutableListOf<Fragment>()
+            fragmentList.clear()
+
+            bookData?.let {
+
+                // Book Title
+                binding.txtBookTitle.text = it.bookTitle
+
+                // Background Image
+                val backgroundImage = "$destinationFolder/${it.backgroundImage}"
+                if (File(backgroundImage).exists()) {
+                    Glide
+                        .with(context)
+                        .load(backgroundImage)
+                        .centerCrop()
+                        .into(binding.imgBackground)
+                } else {
+                    Glide
+                        .with(context)
+                        .load(R.drawable.page_background)
+                        .centerCrop()
+                        .into(binding.imgBackground)
+                }
+
+                // Pages
+                for (page in it.pages) {
+                    if (page.isActive) {
+                        val pageModel = BookPageModel(
+                            title = page.title,
+                            message = page.message,
+                            video = page.video,
+                            videoOwner = page.videoOwner,
+                            image = page.image,
+                            imageOwner = page.imageOwner,
+                            voice = page.voice,
+                            time = page.time,
+                            isActive = page.isActive
+                        )
+                        fragmentList.add(PageFragment.newInstance(pageModel, folderName))
+                    }
+                }
+
+                // Adapter
+                val pageAdapter = ViewPagerAdapter(this@BookActivity, fragmentList)
+
+                // ViewPager 2
+                binding.viewPager.apply {
+                    currentItem = currentPage
+                    offscreenPageLimit = 1
+                    isUserInputEnabled = false
+                    adapter = pageAdapter
+                    //setPageTransformer(ZoomOutPageTransformer())
+                    /*
+                    setPageTransformer { page, position ->
+                        setParallaxTransformation(page, position)
+                    }
+                     */
+                    registerOnPageChangeCallback(viewpagerPageChangeCallback)
+                }
+
+                playSong()
+                pageChanged(currentPage)
+            }
+        }
+    }
+
+    private fun playSong() {
+        // Song
+        val destinationFolder = "${getDir("packages", Context.MODE_PRIVATE)}/$folderName"
+        val songPath = "$destinationFolder/${bookData?.backgroundSong}"
+
+        mediaPlayer?.stop()
+        mediaPlayer?.release()
+        mediaPlayer = null
+        mediaPlayer = MediaPlayer().apply {
+            isLooping = true
+            setVolume(.1f, .1f)
+            setAudioAttributes(
+                AudioAttributes.Builder()
+                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                    .setUsage(AudioAttributes.USAGE_MEDIA)
+                    .build()
+            )
+        }
+
+        if (!bookData?.backgroundSong.isNullOrBlank() && File(songPath).exists()) {
+            mediaPlayer?.setDataSource(context, Uri.parse(songPath))
+        } else {
+            val descriptor = assets.openFd("song.mp3")
+            mediaPlayer?.setDataSource(descriptor.fileDescriptor, descriptor.startOffset, descriptor.length)
+            descriptor.close()
+        }
+
+        mediaPlayer?.apply {
+            prepareAsync()
+            setOnPreparedListener {
+                it.start()
+                binding.btnMute.setBackgroundResource(R.drawable.ic_music_on)
+                isSongStarted = true
+                isSongPlaying = true
+            }
+            //prepare()
+            //start()
+            setOnErrorListener { _, _, _ -> true }
         }
     }
 

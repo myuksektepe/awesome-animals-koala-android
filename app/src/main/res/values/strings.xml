@@ -49,4 +49,6 @@
     <string name="are_you_sure">Emin Misiniz?</string>
     <string name="are_you_sure_exit_to_book">Kitabı kapatmak istediğinize emin misiniz?</string>
     <string name="close_book">Kitabı Kapat</string>
+    <string name="books">Kitaplar</string>
+    <string name="pages">Sayfa</string>
 </resources>
